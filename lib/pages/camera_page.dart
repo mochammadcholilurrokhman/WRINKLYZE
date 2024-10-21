@@ -88,11 +88,16 @@ class _CameraPageState extends State<CameraPage> {
 
           // Bagian bawah: Tombol kamera dan switch kamera
           Container(
-            padding: EdgeInsets.symmetric(vertical: 40),
+            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
             color: Color(0xff052135),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                IconButton(
+                  onPressed: switchCamera,
+                  icon: Icon(Icons.switch_camera, color: Colors.white),
+                  iconSize: 40,
+                ),
                 // Tombol kamera di tengah
                 FloatingActionButton(
                   onPressed: () async {
@@ -106,7 +111,6 @@ class _CameraPageState extends State<CameraPage> {
                   backgroundColor: Colors.white,
                   child: Icon(Icons.camera_alt, color: Colors.black),
                 ),
-                SizedBox(width: 20),
 
                 // Tombol switch kamera di sebelah kanan
                 IconButton(
