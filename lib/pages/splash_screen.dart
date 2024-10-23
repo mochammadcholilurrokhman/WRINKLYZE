@@ -1,6 +1,4 @@
-// File: pages/splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:wrinklyze_6/main.dart';
 import 'dart:async';
 import 'package:wrinklyze_6/pages/main_page.dart';
 
@@ -16,8 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => MainPage()), // Pindah ke MainPage
+        MaterialPageRoute(builder: (context) => MainPage()),
       );
     });
   }
@@ -28,9 +25,9 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Color(0xffE9EEF0),
       body: Center(
         child: Image.asset(
-          'assets/images/logo_splash.png', // Gambar logo untuk splash screen
-          width: 300,
-          height: 300,
+          'assets/images/splash_logo.png',
+          width: 250,
+          height: 250,
         ),
       ),
     );

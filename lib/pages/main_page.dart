@@ -1,4 +1,3 @@
-// File: pages/main_page.dart
 import 'package:flutter/material.dart';
 import 'package:wrinklyze_6/pages/account_page.dart';
 import 'package:wrinklyze_6/pages/files_page.dart';
@@ -10,23 +9,23 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0; // Index untuk halaman yang aktif
+  int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(), // Halaman Home
-    FilesPage(), // Halaman Files (dengan tombol kamera)
-    AccountPage(), // Halaman Account
+    HomePage(),
+    FilesPage(),
+    AccountPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex], // Memilih halaman berdasarkan index
+      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
           setState(() {
-            _currentIndex = index; // Ubah halaman ketika di-tap
+            _currentIndex = index;
           });
         },
         items: [

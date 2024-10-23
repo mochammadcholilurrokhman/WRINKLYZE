@@ -1,4 +1,3 @@
-// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
 

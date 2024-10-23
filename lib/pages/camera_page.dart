@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -9,27 +10,55 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   CameraController? _cameraController;
   List<CameraDescription>? cameras;
-  int _selectedCameraIndex = 0;
+  int? _selectedCameraIndex;
+  int? _frontCameraIndex;
+  int? _backCameraIndex;
   bool _isCameraInitialized = false;
+  bool _isCameraSwitching = false;
+
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    initializeCamera(_selectedCameraIndex);
+    initializeCameras();
+  }
+
+  Future<void> initializeCameras() async {
+    cameras = await availableCameras();
+    if (cameras != null && cameras!.isNotEmpty) {
+      for (int i = 0; i < cameras!.length; i++) {
+        if (cameras![i].lensDirection == CameraLensDirection.front) {
+          _frontCameraIndex = i;
+        } else if (cameras![i].lensDirection == CameraLensDirection.back) {
+          _backCameraIndex = i;
+        }
+      }
+      // Set initial camera to back camera
+      _selectedCameraIndex = _backCameraIndex;
+      if (_selectedCameraIndex != null) {
+        await initializeCamera(_selectedCameraIndex!);
+      }
+    }
   }
 
   Future<void> initializeCamera(int cameraIndex) async {
-    cameras = await availableCameras();
-    if (cameras != null && cameras!.isNotEmpty) {
-      _cameraController = CameraController(
-        cameras![cameraIndex],
-        ResolutionPreset.high,
-      );
-      await _cameraController!.initialize();
-      setState(() {
-        _isCameraInitialized = true;
-      });
-    }
+    setState(() {
+      _isCameraInitialized = false;
+      _isCameraSwitching = true;
+    });
+
+    _cameraController = CameraController(
+      cameras![cameraIndex],
+      ResolutionPreset.high,
+    );
+
+    await _cameraController!.initialize();
+
+    setState(() {
+      _isCameraInitialized = true;
+      _isCameraSwitching = false;
+    });
   }
 
   @override
@@ -38,12 +67,34 @@ class _CameraPageState extends State<CameraPage> {
     super.dispose();
   }
 
-  void switchCamera() {
-    if (cameras != null && cameras!.length > 1) {
+  Future<void> switchCamera() async {
+    if (cameras != null && !_isCameraSwitching) {
       setState(() {
-        _selectedCameraIndex = (_selectedCameraIndex + 1) % cameras!.length;
-        initializeCamera(_selectedCameraIndex);
+        _isCameraSwitching = true;
       });
+
+      if (_selectedCameraIndex == _backCameraIndex) {
+        _selectedCameraIndex = _frontCameraIndex;
+      } else {
+        _selectedCameraIndex = _backCameraIndex;
+      }
+
+      if (_selectedCameraIndex != null) {
+        await initializeCamera(_selectedCameraIndex!);
+      }
+
+      setState(() {
+        _isCameraSwitching = false;
+      });
+    }
+  }
+
+  Future<void> pickImageFromGallery() async {
+    final XFile? image =
+        await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      print("Image selected: ${image.path}");
     }
   }
 
@@ -57,7 +108,6 @@ class _CameraPageState extends State<CameraPage> {
       ),
       body: Column(
         children: [
-          // Bagian tengah untuk menampilkan kamera
           Expanded(
             child: _isCameraInitialized
                 ? Center(
@@ -69,13 +119,12 @@ class _CameraPageState extends State<CameraPage> {
                           width: MediaQuery.of(context).size.width,
                           child: _cameraController != null &&
                                   cameras != null &&
-                                  cameras![_selectedCameraIndex]
+                                  cameras![_selectedCameraIndex!]
                                           .lensDirection ==
                                       CameraLensDirection.front
                               ? Transform(
                                   alignment: Alignment.center,
-                                  transform: Matrix4.rotationY(
-                                      3.14159), // Mirror untuk kamera depan
+                                  transform: Matrix4.rotationY(3.14159),
                                   child: CameraPreview(_cameraController!),
                                 )
                               : CameraPreview(_cameraController!),
@@ -85,8 +134,6 @@ class _CameraPageState extends State<CameraPage> {
                   )
                 : Center(child: CircularProgressIndicator()),
           ),
-
-          // Bagian bawah: Tombol kamera dan switch kamera
           Container(
             padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
             color: Color(0xff052135),
@@ -94,11 +141,10 @@ class _CameraPageState extends State<CameraPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 IconButton(
-                  onPressed: switchCamera,
-                  icon: Icon(Icons.switch_camera, color: Colors.white),
+                  onPressed: pickImageFromGallery,
+                  icon: Icon(Icons.photo_library, color: Colors.white),
                   iconSize: 40,
                 ),
-                // Tombol kamera di tengah
                 FloatingActionButton(
                   onPressed: () async {
                     try {
@@ -111,10 +157,8 @@ class _CameraPageState extends State<CameraPage> {
                   backgroundColor: Colors.white,
                   child: Icon(Icons.camera_alt, color: Colors.black),
                 ),
-
-                // Tombol switch kamera di sebelah kanan
                 IconButton(
-                  onPressed: switchCamera,
+                  onPressed: !_isCameraSwitching ? switchCamera : null,
                   icon: Icon(Icons.switch_camera, color: Colors.white),
                   iconSize: 40,
                 ),

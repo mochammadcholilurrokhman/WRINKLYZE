@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wrinklyze_6/data/dummy_recognition.dart';
-import 'package:wrinklyze_6/pages/camera_page.dart'; // Import CameraPage
+import 'package:wrinklyze_6/pages/camera_page.dart';
 
 class FilesPage extends StatelessWidget {
   @override
@@ -45,15 +45,14 @@ class FilesPage extends StatelessWidget {
         onPressed: () async {
           final imagePath = await Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => CameraPage()), // Navigate to CameraPage
+            MaterialPageRoute(builder: (context) => CameraPage()),
           );
           if (imagePath != null) {
             print('Image captured at path: $imagePath');
           }
         },
-        backgroundColor: Colors.blue, // Button color
-        child: const Icon(Icons.camera_alt, color: Colors.white), // Camera icon
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.camera_alt, color: Colors.white),
       ),
     );
   }
