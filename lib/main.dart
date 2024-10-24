@@ -16,9 +16,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Wrinklyze',
       theme: ThemeData(
-        primaryColor: Color(0xFFE9EEF0), // Set primary color to E9EEF0
-        scaffoldBackgroundColor:
-            Color(0xFFE9EEF0), // Set scaffold background color to E9EEF0
+        primaryColor: Color(0xFFE9EEF0),
+        scaffoldBackgroundColor: Color(0xFFE9EEF0),
       ),
       home: SplashScreen(),
     );
