@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:wrinklyze_6/pages/home_page.dart';
 import 'package:wrinklyze_6/pages/account_page.dart';
 import 'package:wrinklyze_6/pages/camera_page.dart';
+import 'package:wrinklyze_6/pages/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainPage(),
+      home: SplashScreen(),
     );
   }
 }
@@ -27,7 +29,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+  int _bottomNavIndex = 0;
 
   final List<Widget> _pages = [
     HomePage(),
@@ -35,16 +37,26 @@ class _MainPageState extends State<MainPage> {
     AccountPage(),
   ];
 
+  final List<IconData> iconList = [
+    Icons.home_filled,
+    Icons.person,
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: Color(0xFF052135),
-        unselectedItemColor: Color(0xFF7995A4),
-        onTap: (int index) async {
-          if (index == 1) {
+      body: _bottomNavIndex == 1 ? AccountPage() : HomePage(),
+      floatingActionButton: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: FloatingActionButton(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          onPressed: () async {
             final imagePath = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CameraPage()),
@@ -52,26 +64,38 @@ class _MainPageState extends State<MainPage> {
             if (imagePath != null) {
               print('Image captured at path: $imagePath');
             }
-          } else {
-            setState(() {
-              _currentIndex = index;
-            });
-          }
+          },
+          child: Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF7995A4),
+            ),
+            child: Icon(
+              Icons.camera_alt,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: AnimatedBottomNavigationBar(
+        icons: iconList,
+        activeIndex: _bottomNavIndex,
+        gapLocation: GapLocation.center,
+        notchSmoothness: NotchSmoothness.verySmoothEdge,
+        leftCornerRadius: 0,
+        rightCornerRadius: 0,
+        iconSize: 30,
+        onTap: (index) {
+          setState(() {
+            _bottomNavIndex = index;
+          });
         },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
-        ],
+        activeColor: Color(0xFF052135),
+        inactiveColor: Color(0xFF7995A4),
       ),
     );
   }
