@@ -16,7 +16,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Wrinklyze',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Color(0xFFE9EEF0), // Set primary color to E9EEF0
+        scaffoldBackgroundColor:
+            Color(0xFFE9EEF0), // Set scaffold background color to E9EEF0
       ),
       home: SplashScreen(),
     );
@@ -89,6 +91,7 @@ class _MainPageState extends State<MainPage> {
         leftCornerRadius: 0,
         rightCornerRadius: 0,
         iconSize: 30,
+        backgroundColor: Colors.white,
         onTap: (index) {
           setState(() {
             _bottomNavIndex = index;
