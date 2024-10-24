@@ -1,47 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:wrinklyze_6/pages/account_page.dart';
-import 'package:wrinklyze_6/pages/files_page.dart';
-import 'package:wrinklyze_6/pages/home_page.dart';
+import 'package:wrinklyze_6/main.dart';
 
-class MainPage extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   @override
-  _MainPageState createState() => _MainPageState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateToHome();
+  }
 
-  final List<Widget> _pages = [
-    HomePage(),
-    FilesPage(),
-    AccountPage(),
-  ];
+  _navigateToHome() async {
+    await Future.delayed(Duration(milliseconds: 3000), () {});
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MainPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.folder),
-            label: 'Files',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
-        ],
+      body: Center(
+        child: Text(
+          'Welcome to Wrinklyze',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

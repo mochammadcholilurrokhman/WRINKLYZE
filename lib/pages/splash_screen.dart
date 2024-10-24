@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wrinklyze_6/main.dart';
 import 'dart:async';
-import 'package:wrinklyze_6/pages/main_page.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
