@@ -3,6 +3,9 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:wrinklyze_6/pages/home_page.dart';
 import 'package:wrinklyze_6/pages/account_page.dart';
 import 'package:wrinklyze_6/pages/camera_page.dart';
+import 'package:wrinklyze_6/pages/login.dart';
+import 'package:wrinklyze_6/pages/onboarding.dart';
+import 'package:wrinklyze_6/pages/register_page.dart';
 import 'package:wrinklyze_6/pages/splash_screen.dart';
 
 void main() {
@@ -19,6 +22,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFFE9EEF0),
         scaffoldBackgroundColor: Color(0xFFE9EEF0),
       ),
+      // home: SignUpPage(),
+      // home: LoginPage(),
+      // home: OnboardingScreen(),
       home: SplashScreen(),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wrinklyze_6/pages/login.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -10,7 +11,10 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentPage = 0;
   List<Map<String, String>> splashData = [
-    {"image": "assets/welcome.png", "text": "Easy wrinkle detection"},
+    {
+      "image": "assets/images/onboarding1.png",
+      "text": "Easy Wrinkle Detection"
+    },
   ];
   @override
   Widget build(BuildContext context) {
@@ -63,18 +67,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       const Spacer(flex: 3),
                       ElevatedButton(
                         onPressed: () {
-                          // Navigate to Sign In Screen or any other screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
-                          elevation: 0,
+                          fixedSize: const Size(350, 60),
+                          side: const BorderSide(color: Colors.grey),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           backgroundColor: const Color(0xFF052135),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 48),
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                        child: const Text(
+                          'Get started',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
                           ),
                         ),
-                        child: const Text("Register Now"),
                       ),
                       const Spacer(),
                     ],
@@ -154,7 +169,7 @@ class _SplashContentState extends State<SplashContent> {
                   ),
                 ),
                 const Text(
-                  'Identify facial wrinkles quickly and accurate using advanced technology.',
+                  'Identify facial wrinkles quickly and accurate using \nadvanced technology.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,

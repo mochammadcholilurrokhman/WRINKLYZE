@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wrinklyze_6/pages/login.dart';
 
 class AccountPage extends StatelessWidget {
   @override
@@ -171,7 +172,10 @@ class AccountPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle log out
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
