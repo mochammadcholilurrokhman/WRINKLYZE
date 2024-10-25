@@ -8,6 +8,7 @@ import 'package:wrinklyze_6/pages/onboarding.dart';
 import 'package:wrinklyze_6/pages/register_page.dart';
 import 'package:wrinklyze_6/pages/splash_screen.dart';
 
+
 void main() {
   runApp(MyApp());
 }
