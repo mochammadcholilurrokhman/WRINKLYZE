@@ -5,6 +5,7 @@ import 'package:wrinklyze_6/pages/account_page.dart';
 import 'package:wrinklyze_6/pages/camera_page.dart';
 import 'package:wrinklyze_6/pages/splash_screen.dart';
 
+
 void main() {
   runApp(MyApp());
 }
