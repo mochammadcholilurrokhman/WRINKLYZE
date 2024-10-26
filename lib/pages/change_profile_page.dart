@@ -22,34 +22,30 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Stack(
             clipBehavior: Clip.none, // Allow overflow outside the Stack
             children: [
-              const Padding(
-                padding: EdgeInsets.only(
-                    bottom:
-                        20.0), // Adjust the bottom padding to move the text upwards
-                child: Center(
-                  child: Text(
-                    'Profile',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+              AppBar(
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context).pop(),
+                  color: Colors.white, // Warna icon back
                 ),
-              ),
-              Positioned(
-                left: 4.0, // Adjust the left position as needed
-                top: 43.0, // Adjust the top position as needed
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  onPressed: () {
-                    // Logic to handle back button press
-                  },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                titleSpacing:
+                    80, // Reduce the space between the icon and the title
+                title: const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 8), // Adjust the width as needed
+                    Text(
+                      'Profile',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Positioned(
