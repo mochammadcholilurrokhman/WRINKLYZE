@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wrinklyze_6/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/home_page.dart';
 import 'package:wrinklyze_6/pages/register_page.dart';
+import 'package:wrinklyze_6/main.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,21 +14,53 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     super.initState();
     passwordVisible = true;
   }
 
+  // Method for signing in with email and password
+  Future<void> _signInWithEmailAndPassword() async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MainPage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Error: $e');
+      // Show error message to user
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Login Failed'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          true, // Enables resizing to avoid keyboard overlay
       body: Stack(
         children: [
           SingleChildScrollView(
-            // Add SingleChildScrollView to allow scrolling
             child: Padding(
               padding: const EdgeInsets.only(top: 66.0),
               child: Center(
@@ -37,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Login',
                       style: TextStyle(
-                        fontFamily: 'poppins',
+                        fontFamily: 'Poppins',
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF052135),
@@ -46,8 +79,8 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 20),
                     Image.asset(
                       'assets/images/welcome_logo.png',
-                      width: 230,
-                      height: 230,
+                      width: 200,
+                      height: 200,
                       fit: BoxFit.cover,
                     ),
                     const SizedBox(height: 50),
@@ -140,16 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MainPage(),
-                          ),
-                          (Route<dynamic> route) =>
-                              false, // Remove all previous routes
-                        );
-                      },
+                      onPressed: _signInWithEmailAndPassword,
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size(350, 60),
                         side: const BorderSide(color: Colors.grey),
@@ -201,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     ElevatedButton.icon(
                       onPressed: () {
-                        // Logic for Google login
+                        // Google login logic (to be implemented)
                       },
                       icon: const Icon(Icons.g_translate),
                       label: const Text(
@@ -232,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Don’t have an account?',
+                            'Do not have an account?',
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 16,
@@ -257,16 +281,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Positioned(
-          //   left: 3,
-          //   top: 20,
-          //   child: IconButton(
-          //     icon: Icon(Icons.arrow_back, color: Color(0xFF052135), size: 30),
-          //     onPressed: () {
-          //       // Logic for back button
-          //     },
-          //   ),
-          // ),
         ],
       ),
     );
