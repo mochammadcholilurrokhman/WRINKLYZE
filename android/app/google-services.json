@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1050006956718",
+    "project_id": "mobile-app-wrinklyze",
+    "storage_bucket": "mobile-app-wrinklyze.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050006956718:android:84edf1ba9d2e277b62db3f",
+        "android_client_info": {
+          "package_name": "com.example.wrinklyze_6"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH_7qRD7BBpKqdAB0V0Bl0OcJ53LuS8Ko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
