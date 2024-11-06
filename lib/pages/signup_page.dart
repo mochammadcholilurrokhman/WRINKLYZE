@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wrinklyze_6/main.dart';
-import 'package:wrinklyze_6/pages/signup_page.dart';
+import 'package:wrinklyze_6/pages/login.dart';
 
-class LoginPage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   bool passwordVisible = false;
+  bool termsAccepted = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -19,47 +21,55 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     passwordVisible = true;
-
-    emailController.addListener(_updateLoginButtonState);
-    passwordController.addListener(_updateLoginButtonState);
   }
 
-  void _updateLoginButtonState() {
-    setState(() {});
-  }
+  Future<void> _signUpWithEmailAndPassword() async {
+    if (passwordController.text.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your password should be at least 8 characters long'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-  Future<void> _signInWithEmailAndPassword() async {
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => MainPage()),
-        (Route<dynamic> route) => false,
-      );
-    } catch (e) {
-      print('Error: $e');
+    if (passwordController.text == confirmPasswordController.text) {
+      try {
+        await _auth.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (Route<dynamic> route) => false,
+        );
+      } catch (e) {
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid email'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Incorrect email or password'),
+          content: Text('Passwords do not match'),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  bool _isLoginButtonEnabled() {
+  bool _isSignUpButtonEnabled() {
     return emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty;
-  }
-
-  @override
-  void dispose() {
-    emailController.removeListener(_updateLoginButtonState);
-    passwordController.removeListener(_updateLoginButtonState);
-    super.dispose();
+        passwordController.text.isNotEmpty &&
+        confirmPasswordController.text.isNotEmpty &&
+        passwordController.text == confirmPasswordController.text &&
+        termsAccepted;
   }
 
   @override
@@ -75,20 +85,13 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const SizedBox(height: 5),
                     const Text(
-                      'Login',
+                      'Sign Up',
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF052135),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Image.asset(
-                      'assets/images/welcome_logo.png',
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
                     ),
                     const SizedBox(height: 50),
                     // Email TextField
@@ -163,27 +166,81 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    // Confirm Password TextField
+                    Container(
+                      width: 350,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: StatefulBuilder(
+                        builder: (context, setState) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: TextField(
+                              controller: confirmPasswordController,
+                              keyboardType: TextInputType.text,
+                              obscureText: passwordVisible,
+                              decoration: InputDecoration(
+                                labelText: 'Confirm Password',
+                                labelStyle: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                  color: Color(0xFF797979),
+                                ),
+                                border: InputBorder.none,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: const Color(0xFF797979),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      passwordVisible = !passwordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Forgot your Password?',
+                    // Terms and Conditions Checkbox
+                    Container(
+                      width: 350,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: termsAccepted,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                termsAccepted = value!;
+                              });
+                            },
+                          ),
+                          const Text(
+                            'I have read and agree to the Terms \nand Conditions',
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,
-                              color: Color(0xFF052135),
+                              color: Color(0xFF797979),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
+                    const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _isLoginButtonEnabled()
-                          ? _signInWithEmailAndPassword
+                      onPressed: _isSignUpButtonEnabled()
+                          ? _signUpWithEmailAndPassword
                           : null,
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size(350, 60),
@@ -194,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor: const Color(0xFF052135),
                       ),
                       child: const Text(
-                        'Login',
+                        'Sign Up',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w600,
@@ -203,6 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40.0, vertical: 8.0),
@@ -266,15 +324,15 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 40.0, vertical: 8.0),
+                          horizontal: 40.0, vertical: 0.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Don\'t have an account? ',
+                            'Already have an account? ',
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 16,
@@ -286,11 +344,11 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SignUpPage()),
+                                    builder: (context) => LoginPage()),
                               );
                             },
                             child: const Text(
-                              'Sign Up',
+                              'Login',
                               style: TextStyle(
                                 fontFamily: 'Roboto',
                                 fontSize: 16,

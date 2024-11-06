@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wrinklyze_6/pages/login.dart'; // Import untuk format tanggal
 
-class SignUpPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _RegisterPageState extends State<RegisterPage> {
   bool passwordVisible = false;
   bool termsAccepted = false; // Checkbox state
   final TextEditingController emailController = TextEditingController();

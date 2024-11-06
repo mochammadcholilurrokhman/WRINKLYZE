@@ -28,9 +28,7 @@ class ChangePassword extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              "Your password should be at least 6 characters long "
-              "and should include a combination of numbers, "
-              "letters, and characters.",
+              "Your password should be at least 8 characters long",
               style: TextStyle(
                 fontFamily: 'poppins',
                 fontSize: 12,

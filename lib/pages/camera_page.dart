@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'displaypicture_screen.dart';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -34,7 +35,6 @@ class _CameraPageState extends State<CameraPage> {
           _backCameraIndex = i;
         }
       }
-      // Set initial camera to back camera
       _selectedCameraIndex = _backCameraIndex;
       if (_selectedCameraIndex != null) {
         await initializeCamera(_selectedCameraIndex!);
@@ -145,21 +145,58 @@ class _CameraPageState extends State<CameraPage> {
                   icon: Icon(Icons.photo_library, color: Colors.white),
                   iconSize: 40,
                 ),
-                FloatingActionButton(
-                  onPressed: () async {
+                GestureDetector(
+                  onTap: () async {
                     try {
                       final image = await _cameraController!.takePicture();
-                      Navigator.pop(context, image.path);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DisplayPictureScreen(
+                            imagePath: image.path,
+                            isFrontCamera:
+                                _selectedCameraIndex == _frontCameraIndex,
+                          ),
+                        ),
+                      );
                     } catch (e) {
                       print('Error capturing image: $e');
                     }
                   },
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.camera_alt, color: Colors.black),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 75,
+                        height: 75,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF7995A4),
+                        ),
+                      ),
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFD9D9D9),
+                        ),
+                      ),
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFE9EEF0),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   onPressed: !_isCameraSwitching ? switchCamera : null,
-                  icon: Icon(Icons.switch_camera, color: Colors.white),
+                  icon: Icon(Icons.flip_camera_android_rounded,
+                      color: Colors.white),
                   iconSize: 40,
                 ),
               ],

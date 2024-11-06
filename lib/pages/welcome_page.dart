@@ -1,65 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:wrinklyze_6/pages/login.dart'; // Pastikan untuk mengimpor halaman login
-import 'register_page.dart'; // Pastikan untuk mengimpor halaman register
+import 'package:wrinklyze_6/pages/signup_page.dart';
+import 'login.dart';
+import 'register_page.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      backgroundColor: Color(0xFFE9EEF0),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Background Image
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                    'assets/background.jpg'), // Ganti dengan path gambar latar belakang
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          // Konten
-          Padding(
-            padding: const EdgeInsets.only(top: 100.0), // Padding dari atas
+          Expanded(
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Welcome to Our App',
+                  Image.asset(
+                    'assets/images/welcome_logo.png',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 30),
+                  Text(
+                    'Welcome to Wrinklyze',
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 30,
+                      fontSize: 27,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // Warna teks
+                      color: Color(0xFF112D42),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Your journey starts here',
+                  SizedBox(height: 8),
+                  Text(
+                    'Understanding Your Skin,\nOne Scan at a Time',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 18,
-                      color: Colors.white, // Warna teks
+                      fontFamily: 'Poppins',
+                      fontSize: 17,
+                      color: Color(0xFF8A9CA9),
                     ),
                   ),
-                  const SizedBox(height: 50),
-                  ElevatedButton(
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 350,
+                  height: 60,
+                  child: ElevatedButton(
                     onPressed: () {
-                      // Navigasi ke halaman login
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(300, 60),
+                      backgroundColor: Color(0xFF052135),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      backgroundColor: const Color(0xFF052135),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Login',
                       style: TextStyle(
                         fontFamily: 'Poppins',
@@ -69,35 +76,35 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: 350,
+                  height: 60,
+                  child: OutlinedButton(
                     onPressed: () {
-                      // Navigasi ke halaman register
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => SignUpPage()),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(300, 60),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Color(0xFF052135)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      backgroundColor: const Color(
-                          0xFF52B235), // Ganti warna sesuai preferensi
                     ),
-                    child: const Text(
+                    child: Text(
                       'Sign Up',
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: Colors.white,
+                        color: Color(0xFF052135),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
