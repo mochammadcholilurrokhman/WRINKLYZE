@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wrinklyze_6/pages/signup_page.dart';
 import 'login.dart';
-import 'register_page.dart';
 
 class WelcomePage extends StatelessWidget {
   @override

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
-
-void main() {
-  runApp(MyApp());
-}
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyApp extends StatelessWidget {
   @override

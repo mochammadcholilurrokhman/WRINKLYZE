@@ -1,10 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/about_page.dart';
 import 'package:wrinklyze_6/pages/change_password_page.dart';
 import 'package:wrinklyze_6/pages/change_profile_page.dart';
 import 'package:wrinklyze_6/pages/login.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
+  @override
+  _AccountPageState createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String userEmail = 'Email';
+  String userName = 'User';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUserEmail();
+    _getCurrentUserName();
+  }
+
+  Future<void> _getCurrentUserEmail() async {
+    User? user = _auth.currentUser;
+    setState(() {
+      userEmail = user?.email ?? 'Not logged in';
+    });
+  }
+
+  Future<void> _getCurrentUserName() async {
+    User? user = _auth.currentUser;
+    setState(() {
+      userName = user?.displayName ?? 'User';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,94 +56,41 @@ class AccountPage extends StatelessWidget {
                     radius: 40,
                     backgroundImage: AssetImage('assets/images/profile.png'),
                   ),
-                  SizedBox(width: 30), // distance between image and text
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'User',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                  SizedBox(width: 20),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Text(
-                        'walterwhite69@gmail.com',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          color: Colors.white70,
+                        Text(
+                          userEmail,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 20),
 
-            // Notification and Dark Mode
-            // Container(
-            //   margin: EdgeInsets.symmetric(horizontal: 16.0),
-            //   padding: EdgeInsets.all(16.0),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(1.0),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.grey.withOpacity(0.3),
-            //       ),
-            //     ],
-            //   ),
-            //   child: Column(
-            //     children: [
-            //       ListTile(
-            //         leading: Icon(Icons.notifications),
-            //         title: Text(
-            //           'Notification',
-            //           style: TextStyle(
-            //             fontWeight: FontWeight.bold,
-            //           ),
-            //         ),
-            //         trailing: Switch(
-            //           value: true, // Set initial value here
-            //           onChanged: (value) {
-            //             // Handle switch toggle
-            //           },
-            //           activeColor: Colors.white,
-            //           activeTrackColor: Colors.black,
-            //           inactiveThumbColor: Colors.black,
-            //           inactiveTrackColor: Colors.white,
-            //         ),
-            //       ),
-            //       ListTile(
-            //         leading: Icon(Icons.dark_mode),
-            //         title: Text(
-            //           'Dark Mode',
-            //           style: TextStyle(
-            //             fontWeight: FontWeight.bold,
-            //           ),
-            //         ),
-            //         trailing: Switch(
-            //           value: false, // Set initial value here
-            //           onChanged: (value) {
-            //             // Handle switch toggle
-            //           },
-            //           activeColor: Colors.white,
-            //           activeTrackColor: Colors.black,
-            //           inactiveThumbColor: Colors.black,
-            //           inactiveTrackColor: Colors.white,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // SizedBox(height: 20),
-
-            // Change Profile, Change Password, & About the App
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16.0),
               padding: EdgeInsets.all(16.0),
@@ -137,10 +115,13 @@ class AccountPage extends StatelessWidget {
                     ),
                     trailing: Icon(Icons.arrow_forward_ios, size: 20),
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => ProfilePage()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditProfilePage()),
+                      ).then((_) {
+                        _getCurrentUserName();
+                      });
                     },
                   ),
                   ListTile(
@@ -153,11 +134,11 @@ class AccountPage extends StatelessWidget {
                     ),
                     trailing: Icon(Icons.arrow_forward_ios, size: 20),
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => ChangePassword()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChangePasswordPage()),
+                      );
                     },
                   ),
                   ListTile(
@@ -187,17 +168,14 @@ class AccountPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Show confirmation dialog before logging out
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        backgroundColor:
-                            Colors.blueGrey[50], // Lighter background color
+                        backgroundColor: Colors.blueGrey[50],
                         title: Text(
                           'Confirm Logout',
                           style: TextStyle(
@@ -208,7 +186,7 @@ class AccountPage extends StatelessWidget {
                           ),
                         ),
                         content: Text(
-                          'Are you sure to log out?',
+                          'Are you sure to log out?                 ',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 16,
@@ -218,7 +196,7 @@ class AccountPage extends StatelessWidget {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Close the dialog
+                              Navigator.of(context).pop();
                             },
                             child: Text(
                               'Cancel',
@@ -232,7 +210,8 @@ class AccountPage extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Close the dialog
+                              Navigator.of(context).pop();
+                              _auth.signOut();
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -245,7 +224,7 @@ class AccountPage extends StatelessWidget {
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
-                                color: Colors.red, // Red color for Log Out
+                                color: Colors.red,
                               ),
                             ),
                           ),

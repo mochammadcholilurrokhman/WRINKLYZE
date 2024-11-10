@@ -8,7 +8,7 @@ class AboutPage extends StatelessWidget {
         title: const Text(
           'About Wrinklyze',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Color(0xFF052135),

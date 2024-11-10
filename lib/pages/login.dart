@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/main.dart';
+import 'package:wrinklyze_6/pages/forgot_password_page.dart';
 import 'package:wrinklyze_6/pages/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -43,9 +44,9 @@ class _LoginPageState extends State<LoginPage> {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Incorrect email or password'),
-          backgroundColor: Colors.red,
-        ),
+            content: Text('Incorrect email or password'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2)),
       );
     }
   }
@@ -169,13 +170,19 @@ class _LoginPageState extends State<LoginPage> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ForgotPasswordPage()),
+                            );
+                          },
                           child: const Text(
                             'Forgot your Password?',
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,
-                              color: Color(0xFF052135),
+                              color: Color(0xFF797979),
                             ),
                           ),
                         ),

@@ -27,9 +27,9 @@ class _SignUpPageState extends State<SignUpPage> {
     if (passwordController.text.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Your password should be at least 8 characters long'),
-          backgroundColor: Colors.red,
-        ),
+            content: Text('Your password should be at least 8 characters long'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2)),
       );
       return;
     }
@@ -40,6 +40,14 @@ class _SignUpPageState extends State<SignUpPage> {
           email: emailController.text,
           password: passwordController.text,
         );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Account created successfully!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2)),
+        );
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
@@ -48,18 +56,18 @@ class _SignUpPageState extends State<SignUpPage> {
       } catch (e) {
         print('Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Invalid email'),
-            backgroundColor: Colors.red,
-          ),
+          const SnackBar(
+              content: Text('Invalid email'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2)),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Passwords do not match'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(
+            content: Text('Passwords do not match'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2)),
       );
     }
   }

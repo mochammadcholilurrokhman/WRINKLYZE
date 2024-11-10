@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wrinklyze_6/main.dart';
 import 'dart:async';
 import 'package:wrinklyze_6/pages/welcome_page.dart';
 
