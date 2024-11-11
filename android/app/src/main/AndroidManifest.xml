@@ -7,6 +7,7 @@
     <application
         android:label="wrinklyze_6"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         
         <activity

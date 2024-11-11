@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -16,11 +17,22 @@ class _SignUpPageState extends State<SignUpPage> {
       TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
     passwordVisible = true;
+  }
+
+  Future<void> _createUserDocument(User user) async {
+    await _firestore.collection('users').doc(user.uid).set({
+      'username': user.displayName ?? 'No Username',
+      'email': user.email,
+      'profilePic': user.photoURL ?? '',
+      'createdAt': Timestamp.now(),
+      'lastLogin': Timestamp.now(),
+    });
   }
 
   Future<void> _signUpWithEmailAndPassword() async {
@@ -36,10 +48,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
     if (passwordController.text == confirmPasswordController.text) {
       try {
-        await _auth.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+
+        await _createUserDocument(userCredential.user!);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
