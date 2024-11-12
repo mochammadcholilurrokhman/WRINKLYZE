@@ -2,6 +2,10 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'displaypicture_screen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'dart:io';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -18,6 +22,7 @@ class _CameraPageState extends State<CameraPage> {
   bool _isCameraSwitching = false;
 
   final ImagePicker _imagePicker = ImagePicker();
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -89,12 +94,45 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
+  Future<File> _saveImageLocally(XFile imageFile) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final filePath = p.join(appDir.path, fileName);
+
+    return File(filePath)..writeAsBytes(await imageFile.readAsBytes());
+  }
+
+  Future<String?> _uploadToFirebaseStorage(File imageFile) async {
+    try {
+      final ref = _storage
+          .ref()
+          .child('images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      final uploadTask = await ref.putFile(imageFile);
+      return await uploadTask.ref.getDownloadURL();
+    } catch (e) {
+      print('Failed to upload to Firebase Storage: $e');
+      return null;
+    }
+  }
+
   Future<void> pickImageFromGallery() async {
     final XFile? image =
         await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      print("Image selected: ${image.path}");
+      final File savedFile = await _saveImageLocally(image);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(
+            imageFile: savedFile,
+            isFrontCamera: false,
+          ),
+        ),
+      );
+    } else {
+      print("No image selected");
     }
   }
 
@@ -148,12 +186,14 @@ class _CameraPageState extends State<CameraPage> {
                 GestureDetector(
                   onTap: () async {
                     try {
-                      final image = await _cameraController!.takePicture();
+                      final XFile image =
+                          await _cameraController!.takePicture();
+                      final File savedFile = await _saveImageLocally(image);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DisplayPictureScreen(
-                            imagePath: image.path,
+                            imageFile: savedFile,
                             isFrontCamera:
                                 _selectedCameraIndex == _frontCameraIndex,
                           ),

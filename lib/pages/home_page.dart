@@ -18,33 +18,33 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  final double topCornerRadius = 16.0; // Adjustable top corner radius
+  final double topCornerRadius = 16.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(56.0), // Set the preferred height
+        preferredSize: Size.fromHeight(56.0),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white, // Background color of AppBar
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1), // Shadow color
-                blurRadius: 4.0, // Blur radius
-                offset: Offset(0, 2), // Offset for the shadow
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4.0,
+                offset: Offset(0, 2),
               ),
             ],
           ),
           child: AppBar(
             title: Text(
-              'Home', // Teks pada AppBar
+              'Home',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            backgroundColor: Colors.white, // Make AppBar background transparent
-            elevation: 0, // No additional elevation
+            backgroundColor: Colors.white,
+            elevation: 0,
           ),
         ),
       ),
@@ -52,12 +52,11 @@ class HomePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20), // Memberi jarak di atas setelah AppBar
+          SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween, // Aligns items on both ends
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +69,7 @@ class HomePage extends StatelessWidget {
                         fontSize: 22,
                       ),
                     ),
-                    SizedBox(height: 5), // Add some space between the texts
+                    SizedBox(height: 5),
                     Text(
                       "Let's see the wrinkles on your face!",
                       style: TextStyle(
@@ -109,7 +108,7 @@ class HomePage extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/images/wrinkpedia.png', // Tambahkan gambar menu
+                    'assets/images/wrinkpedia.png',
                     width: 65,
                     height: 65,
                   ),
@@ -123,7 +122,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 24, // Ukuran teks lebih besar
+                          fontSize: 24,
                         ),
                       ),
                       Text(
