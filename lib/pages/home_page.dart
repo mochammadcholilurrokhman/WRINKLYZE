@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class MyApp extends StatelessWidget {
+class HomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Wrinklepedia App',
-      theme: ThemeData(
-        primaryColor: Color(0xFFE9EEF0),
-        scaffoldBackgroundColor: Color(0xFFE9EEF0),
-      ),
-      home: HomePage(),
-    );
-  }
+  _HomePageState createState() => _HomePageState();
 }
 
-class HomePage extends StatelessWidget {
-  final double topCornerRadius = 16.0;
+class _HomePageState extends State<HomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String userName = 'User';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUserName();
+  }
+
+  Future<void> _getCurrentUserName() async {
+    User? user = _auth.currentUser;
+    setState(() {
+      userName = user?.displayName ?? 'User';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,19 +68,21 @@ class HomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hi! Walter White',
+                      'Hi! $userName',
                       style: TextStyle(
                         color: Colors.black,
-                        fontWeight: FontWeight.bold,
                         fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                     SizedBox(height: 5),
                     Text(
                       "Let's see the wrinkles on your face!",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.normal,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -123,13 +131,15 @@ class HomePage extends StatelessWidget {
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       Text(
                         "Decode the Secrets of Early Aging",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 11,
+                          fontFamily: 'Poppins',
                         ),
                       ),
                       SizedBox(height: 15),
@@ -225,7 +235,7 @@ class HomePage extends StatelessWidget {
                           RecentFile(
                             imagePath: 'assets/images/person1.png',
                             title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06:15',
+                            date: '15/10/2024 06.15',
                           ),
                         ],
                       ),

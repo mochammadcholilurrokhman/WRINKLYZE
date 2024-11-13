@@ -28,9 +28,8 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final ref = FirebaseStorage.instance.ref().child(
+            'images/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
         final uploadTask = await ref.putFile(widget.imageFile);
         final downloadUrl = await uploadTask.ref.getDownloadURL();

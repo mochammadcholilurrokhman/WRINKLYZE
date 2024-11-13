@@ -19,12 +19,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop(); // Return to the previous page (e.g., login)
-    } catch (e) {
+      Navigator.of(context).pop();
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'user-not-found') {
+        message = 'Email is not registered. Please check and try again.';
+      } else {
+        message = 'Failed to send password reset email. Please try again.';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text('Failed to send password reset email. Please try again.'),
+          content: Text(message),
           backgroundColor: Colors.red,
         ),
       );
