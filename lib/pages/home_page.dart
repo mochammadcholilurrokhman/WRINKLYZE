@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
@@ -23,6 +24,26 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       userName = user?.displayName ?? 'User';
     });
+  }
+
+  Stream<List<Map<String, dynamic>>> _getCapturedImages() {
+    final user = _auth.currentUser;
+    if (user != null) {
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('captures')
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => {
+                    'url': doc['url'],
+                    'filename': doc['filename'],
+                    'timestamp': (doc['timestamp'] as Timestamp).toDate(),
+                  })
+              .toList());
+    }
+    return const Stream.empty();
   }
 
   @override
@@ -173,45 +194,26 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.all(16.0),
-                        children: [
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 05.27',
-                            date: '15/10/2024 05:27',
-                          ),
-                          SizedBox(height: 10),
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06:15',
-                          ),
-                          SizedBox(height: 10),
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06:15',
-                          ),
-                          SizedBox(height: 10),
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06:15',
-                          ),
-                          SizedBox(height: 10),
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06:15',
-                          ),
-                          SizedBox(height: 10),
-                          RecentFile(
-                            imagePath: 'assets/images/person1.png',
-                            title: 'WrinklyzeScanner 15-10-2024 06.15',
-                            date: '15/10/2024 06.15',
-                          ),
-                        ],
+                      child: StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: _getCapturedImages(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          final captures = snapshot.data!;
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            itemCount: captures.length,
+                            itemBuilder: (context, index) {
+                              final capture = captures[index];
+                              return RecentFile(
+                                imagePath: capture['url'],
+                                title: capture['filename'],
+                                date: capture['timestamp'].toString(),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                   ],

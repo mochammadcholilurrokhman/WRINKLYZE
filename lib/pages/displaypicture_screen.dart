@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,8 +29,10 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        final ref = FirebaseStorage.instance.ref().child(
-            'images/${user.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_uploads/${user.uid}/$fileName');
 
         final uploadTask = await ref.putFile(widget.imageFile);
         final downloadUrl = await uploadTask.ref.getDownloadURL();
@@ -38,21 +41,24 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
           _isUploading = false;
         });
 
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('captures')
+            .add({
+          'url': downloadUrl,
+          'filename': fileName,
+          'timestamp': DateTime.now(),
+        });
+
         return downloadUrl;
       } catch (e) {
         setState(() {
           _isUploading = false;
         });
-
         print("Failed to upload image: $e");
         return null;
       }
-    } else {
-      setState(() {
-        _isUploading = false;
-      });
-      print("User is not authenticated.");
-      return null;
     }
   }
 
