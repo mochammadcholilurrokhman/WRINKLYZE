@@ -15,6 +15,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,7 +28,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _createUserDocument(User user) async {
     await _firestore.collection('users').doc(user.uid).set({
-      'username': user.displayName ?? 'No Username',
+      'username': usernameController.text.trim(),
       'email': user.email,
       'profilePic': user.photoURL ?? '',
       'createdAt': Timestamp.now(),
@@ -39,9 +40,10 @@ class _SignUpPageState extends State<SignUpPage> {
     if (passwordController.text.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Your password should be at least 8 characters long'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
+          content: Text('Your password should be at least 8 characters long'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
       );
       return;
     }
@@ -50,17 +52,22 @@ class _SignUpPageState extends State<SignUpPage> {
       try {
         UserCredential userCredential =
             await _auth.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
+
+        await userCredential.user?.updateDisplayName(
+          usernameController.text.trim(),
         );
 
         await _createUserDocument(userCredential.user!);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Account created successfully!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2)),
+            content: Text('Account created successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
         );
 
         Navigator.pushAndRemoveUntil(
@@ -72,23 +79,26 @@ class _SignUpPageState extends State<SignUpPage> {
         print('Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Invalid email'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 2)),
+            content: Text('Invalid email'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Passwords do not match'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
 
   bool _isSignUpButtonEnabled() {
-    return emailController.text.isNotEmpty &&
+    return usernameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
         passwordController.text.isNotEmpty &&
         confirmPasswordController.text.isNotEmpty &&
         passwordController.text == confirmPasswordController.text &&
@@ -117,6 +127,32 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                     const SizedBox(height: 50),
+                    // Username TextField
+                    Container(
+                      width: 350,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: TextField(
+                          controller: usernameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Username',
+                            labelStyle: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: 16,
+                              color: Color(0xFF797979),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     // Email TextField
                     Container(
                       width: 350,

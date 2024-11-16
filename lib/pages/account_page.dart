@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/about_page.dart';
@@ -12,8 +13,8 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String userEmail = 'Email';
-  String userName = 'User';
+  String userEmail = '';
+  String userName = '';
 
   @override
   void initState() {
@@ -31,9 +32,16 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _getCurrentUserName() async {
     User? user = _auth.currentUser;
-    setState(() {
-      userName = user?.displayName ?? 'User';
-    });
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        userName = doc['username'] ?? '';
+      });
+    }
   }
 
   @override
@@ -119,8 +127,13 @@ class _AccountPageState extends State<AccountPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => EditProfilePage()),
-                      ).then((_) {
-                        _getCurrentUserName();
+                      ).then((updatedUsername) {
+                        if (updatedUsername != null &&
+                            updatedUsername is String) {
+                          setState(() {
+                            userName = updatedUsername;
+                          });
+                        }
                       });
                     },
                   ),

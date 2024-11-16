@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -23,6 +24,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() {
       usernameController.text = user?.displayName ?? 'User';
     });
+  }
+
+  Future<void> _saveProfileChanges() async {
+    String newUsername = usernameController.text;
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      await user.updateDisplayName(newUsername);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'username': newUsername});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Navigator.of(context).pop(newUsername);
+    }
   }
 
   @override
@@ -203,20 +228,5 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
-  }
-
-  Future<void> _saveProfileChanges() async {
-    String newUsername = usernameController.text;
-    User? user = _auth.currentUser;
-
-    if (user != null) {
-      await user.updateDisplayName(newUsername);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2)),
-      );
-    }
   }
 }

@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String userName = 'User';
+  String userName = '';
 
   @override
   void initState() {
@@ -21,9 +21,16 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _getCurrentUserName() async {
     User? user = _auth.currentUser;
-    setState(() {
-      userName = user?.displayName ?? 'User';
-    });
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        userName = doc['username'] ?? '';
+      });
+    }
   }
 
   Stream<List<Map<String, dynamic>>> _getCapturedImages() {
