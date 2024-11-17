@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wrinklyze_6/pages/face_result_page.dart';
 import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
 
@@ -33,6 +35,51 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _deleteCapture(
+      BuildContext context, String captureId, String imagePath) async {
+    try {
+      // Verifikasi apakah pengguna sudah terautentikasi
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User is not logged in");
+      }
+
+      // Verifikasi apakah captureId ada dan tidak kosong
+      if (captureId.isEmpty) {
+        throw Exception("Capture ID is empty");
+      }
+
+      // Path dokumen yang valid untuk menghapus capture
+      final captureDocPath = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('captures')
+          .doc(captureId);
+
+      // Pastikan dokumen ada sebelum menghapus
+      final docSnapshot = await captureDocPath.get();
+      if (!docSnapshot.exists) {
+        throw Exception("Capture document not found");
+      }
+
+      // Hapus dokumen dari Firestore
+      await captureDocPath.delete();
+
+      // Hapus gambar dari Firebase Storage (gunakan imagePath yang benar)
+      await FirebaseStorage.instance.refFromURL(imagePath).delete();
+
+      // Menampilkan pesan sukses
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Capture deleted successfully!')),
+      );
+    } catch (e) {
+      // Menampilkan pesan error jika gagal
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete capture: $e')),
+      );
+    }
+  }
+
   Stream<List<Map<String, dynamic>>> _getCapturedImages() {
     final user = _auth.currentUser;
     if (user != null) {
@@ -44,6 +91,7 @@ class _HomePageState extends State<HomePage> {
           .snapshots()
           .map((snapshot) => snapshot.docs
               .map((doc) => {
+                    'captureId': doc.id,
                     'url': doc['url'],
                     'filename': doc['filename'],
                     'timestamp': (doc['timestamp'] as Timestamp).toDate(),
@@ -201,28 +249,50 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                      child: StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: _getCapturedImages(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          final captures = snapshot.data!;
-                          return ListView.builder(
-                            padding: const EdgeInsets.all(16.0),
-                            itemCount: captures.length,
-                            itemBuilder: (context, index) {
-                              final capture = captures[index];
-                              return RecentFile(
+                        child: StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: _getCapturedImages(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        final captures = snapshot.data!;
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16.0),
+                          itemCount: captures.length,
+                          itemBuilder: (context, index) {
+                            final capture = captures[index];
+
+                            // Pastikan captureId ada dan tidak null
+                            final captureId = capture['captureId'] ??
+                                ''; // Jika null, gunakan string kosong
+
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FaceScanResultPage(
+                                      skinType:
+                                          "Wrinkles at Rest (Kerutan Sedang)",
+                                      details:
+                                          "Kerutan tetap terlihat meskipun wajah dalam keadaan rileks.",
+                                      imagePath: capture['url'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: RecentFile(
                                 imagePath: capture['url'],
                                 title: capture['filename'],
                                 date: capture['timestamp'].toString(),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
+                                captureId:
+                                    captureId, // Menggunakan captureId yang aman
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )),
                   ],
                 ),
               ),

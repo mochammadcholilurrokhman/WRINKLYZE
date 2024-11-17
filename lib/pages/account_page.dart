@@ -25,9 +25,11 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _getCurrentUserEmail() async {
     User? user = _auth.currentUser;
-    setState(() {
-      userEmail = user?.email ?? 'Not logged in';
-    });
+    if (mounted) {
+      setState(() {
+        userEmail = user?.email ?? 'Not logged in';
+      });
+    }
   }
 
   Future<void> _getCurrentUserName() async {
@@ -38,9 +40,11 @@ class _AccountPageState extends State<AccountPage> {
           .doc(user.uid)
           .get();
 
-      setState(() {
-        userName = doc['username'] ?? '';
-      });
+      if (mounted) {
+        setState(() {
+          userName = doc['username'] ?? '';
+        });
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image/image.dart' as img;
+import 'package:wrinklyze_6/pages/face_result_page.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final File imageFile;
@@ -28,55 +29,66 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     });
 
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('user_uploads/${user.uid}/$fileName');
+    if (user == null) {
+      setState(() {
+        _isUploading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("You must be logged in to upload."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return null;
+    }
 
-        File fileToUpload = widget.imageFile;
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_uploads/${user.uid}/$fileName');
 
-        if (widget.isFrontCamera) {
-          final originalImageBytes = await fileToUpload.readAsBytes();
-          final originalImage = img.decodeImage(originalImageBytes);
-          if (originalImage != null) {
-            final mirroredImage = img.flipHorizontal(originalImage);
-            final mirroredImageBytes = img.encodeJpg(mirroredImage);
+      File fileToUpload = widget.imageFile;
 
-            final tempDir = Directory.systemTemp;
-            final mirroredFile = File('${tempDir.path}/$fileName');
-            await mirroredFile.writeAsBytes(mirroredImageBytes);
+      if (widget.isFrontCamera) {
+        final originalImageBytes = await fileToUpload.readAsBytes();
+        final originalImage = img.decodeImage(originalImageBytes);
+        if (originalImage != null) {
+          final mirroredImage = img.flipHorizontal(originalImage);
+          final mirroredImageBytes = img.encodeJpg(mirroredImage);
 
-            fileToUpload = mirroredFile;
-          }
+          final tempDir = Directory.systemTemp;
+          final mirroredFile = File('${tempDir.path}/$fileName');
+          await mirroredFile.writeAsBytes(mirroredImageBytes);
+
+          fileToUpload = mirroredFile;
         }
-
-        final uploadTask = await ref.putFile(fileToUpload);
-        final downloadUrl = await uploadTask.ref.getDownloadURL();
-
-        setState(() {
-          _isUploading = false;
-        });
-
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('captures')
-            .add({
-          'url': downloadUrl,
-          'filename': fileName,
-          'timestamp': DateTime.now(),
-        });
-
-        return downloadUrl;
-      } catch (e) {
-        setState(() {
-          _isUploading = false;
-        });
-        print("Failed to upload image: $e");
-        return null;
       }
+
+      final uploadTask = await ref.putFile(fileToUpload);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('captures')
+          .add({
+        'url': downloadUrl,
+        'filename': fileName,
+        'timestamp': DateTime.now(),
+      });
+
+      setState(() {
+        _isUploading = false;
+      });
+
+      return downloadUrl;
+    } catch (e) {
+      setState(() {
+        _isUploading = false;
+      });
+      print("Failed to upload image: $e");
+      return null;
     }
   }
 
@@ -128,11 +140,15 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       : () async {
                           final downloadUrl = await _uploadToFirebaseStorage();
                           if (downloadUrl != null) {
-                            print("Image uploaded successfully: $downloadUrl");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Image uploaded successfully!"),
-                                backgroundColor: Colors.green,
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FaceScanResultPage(
+                                  skinType: "Wrinkles at Rest (Kerutan Sedang)",
+                                  details:
+                                      "Kerutan tetap terlihat meskipun wajah dalam keadaan rileks. Menunjukkan penuaan yang lebih lanjut.",
+                                  imagePath: downloadUrl,
+                                ),
                               ),
                             );
                           } else {
