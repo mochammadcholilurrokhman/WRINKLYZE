@@ -30,13 +30,6 @@ class FaceScanResultPage extends StatelessWidget {
           'timestamp': DateTime.now(),
         });
 
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //     content: Text("Data saved successfully!"),
-        //     backgroundColor: Colors.green,
-        //   ),
-        // );
-
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MainPage()),
@@ -103,7 +96,12 @@ class FaceScanResultPage extends StatelessWidget {
                       child: Center(
                         child: Text(
                           "Save Information",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),

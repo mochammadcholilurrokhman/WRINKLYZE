@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'displaypicture_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'dart:io';
@@ -10,6 +11,24 @@ import 'dart:io';
 class CameraPage extends StatefulWidget {
   @override
   _CameraPageState createState() => _CameraPageState();
+}
+
+class OvalClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addOval(Rect.fromCenter(
+        center: Offset(size.width / 2, size.height / 2),
+        width: size.width * 0.8,
+        height: size.height * 0.7,
+      ))
+      ..fillType = PathFillType.evenOdd;
+    return path;
+  }
+
+  @override
+  bool shouldReclip(OvalClipper oldClipper) => false;
 }
 
 class _CameraPageState extends State<CameraPage> {
@@ -23,6 +42,7 @@ class _CameraPageState extends State<CameraPage> {
 
   final ImagePicker _imagePicker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -117,6 +137,15 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   Future<void> pickImageFromGallery() async {
+    User? user = _auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You need to be logged in to upload images')),
+      );
+      return;
+    }
+
     final XFile? image =
         await _imagePicker.pickImage(source: ImageSource.gallery);
 
@@ -148,27 +177,38 @@ class _CameraPageState extends State<CameraPage> {
         children: [
           Expanded(
             child: _isCameraInitialized
-                ? Center(
-                    child: AspectRatio(
-                      aspectRatio: _cameraController!.value.aspectRatio,
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: _cameraController != null &&
-                                  cameras != null &&
-                                  cameras![_selectedCameraIndex!]
-                                          .lensDirection ==
-                                      CameraLensDirection.front
-                              ? Transform(
-                                  alignment: Alignment.center,
-                                  transform: Matrix4.rotationY(3.14159),
-                                  child: CameraPreview(_cameraController!),
-                                )
-                              : CameraPreview(_cameraController!),
+                ? Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Center(
+                          child: AspectRatio(
+                            aspectRatio: _cameraController!.value.aspectRatio,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: _selectedCameraIndex == _frontCameraIndex
+                                    ? Transform(
+                                        alignment: Alignment.center,
+                                        transform: Matrix4.rotationY(3.14159),
+                                        child:
+                                            CameraPreview(_cameraController!),
+                                      )
+                                    : CameraPreview(_cameraController!),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned.fill(
+                        child: ClipPath(
+                          clipper: OvalClipper(),
+                          child: Container(
+                            color: Colors.black.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    ],
                   )
                 : Center(child: CircularProgressIndicator()),
           ),
@@ -186,21 +226,30 @@ class _CameraPageState extends State<CameraPage> {
                 GestureDetector(
                   onTap: () async {
                     try {
-                      final XFile image =
-                          await _cameraController!.takePicture();
-                      final File savedFile = await _saveImageLocally(image);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DisplayPictureScreen(
-                            imageFile: savedFile,
-                            isFrontCamera:
-                                _selectedCameraIndex == _frontCameraIndex,
-                          ),
-                        ),
-                      );
+                      if (_cameraController!.value.isInitialized) {
+                        final XFile image =
+                            await _cameraController!.takePicture();
+                        if (image != null) {
+                          final File savedFile = await _saveImageLocally(image);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DisplayPictureScreen(
+                                imageFile: savedFile,
+                                isFrontCamera:
+                                    _selectedCameraIndex == _frontCameraIndex,
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     } catch (e) {
-                      print('Error capturing image: $e');
+                      print("Error capturing image: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(
+                                "Failed to capture image. Please try again.")),
+                      );
                     }
                   },
                   child: Stack(

@@ -85,7 +85,11 @@ class WrinklepediaPage extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
-            color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Poppins',
+        ),
       ),
       body: ListView.builder(
         itemCount: wrinkleData.length,
@@ -93,7 +97,10 @@ class WrinklepediaPage extends StatelessWidget {
           final item = wrinkleData[index];
           return ExpansionTile(
             title: Text(item['title'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                )),
             children: [
               Padding(
                 padding:

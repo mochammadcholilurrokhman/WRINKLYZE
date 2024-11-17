@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       onPressed: _isLoginButtonEnabled()
                           ? _signInWithEmailAndPassword
-                          : null, // Disable tombol jika tidak memenuhi syarat
+                          : null,
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size(350, 60),
                         shape: RoundedRectangleBorder(

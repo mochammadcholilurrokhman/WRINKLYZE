@@ -38,42 +38,34 @@ class _HomePageState extends State<HomePage> {
   Future<void> _deleteCapture(
       BuildContext context, String captureId, String imagePath) async {
     try {
-      // Verifikasi apakah pengguna sudah terautentikasi
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw Exception("User is not logged in");
       }
 
-      // Verifikasi apakah captureId ada dan tidak kosong
       if (captureId.isEmpty) {
         throw Exception("Capture ID is empty");
       }
 
-      // Path dokumen yang valid untuk menghapus capture
       final captureDocPath = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('captures')
           .doc(captureId);
 
-      // Pastikan dokumen ada sebelum menghapus
       final docSnapshot = await captureDocPath.get();
       if (!docSnapshot.exists) {
         throw Exception("Capture document not found");
       }
 
-      // Hapus dokumen dari Firestore
       await captureDocPath.delete();
 
-      // Hapus gambar dari Firebase Storage (gunakan imagePath yang benar)
       await FirebaseStorage.instance.refFromURL(imagePath).delete();
 
-      // Menampilkan pesan sukses
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Capture deleted successfully!')),
       );
     } catch (e) {
-      // Menampilkan pesan error jika gagal
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to delete capture: $e')),
       );
