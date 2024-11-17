@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 24,
+                          fontSize: 22,
                           fontFamily: 'Poppins',
                         ),
                       ),
@@ -140,14 +140,14 @@ class _HomePageState extends State<HomePage> {
                         "Decode the Secrets of Early Aging",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: 10,
                           fontFamily: 'Poppins',
                         ),
                       ),
                       SizedBox(height: 15),
                     ],
                   ),
-                  SizedBox(width: 15),
+                  SizedBox(width: 25),
                   Icon(
                     Icons.arrow_forward_ios,
                     color: Colors.white,

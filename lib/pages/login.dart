@@ -11,6 +11,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool passwordVisible = false;
+  bool isLoading = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -30,6 +31,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _signInWithEmailAndPassword() async {
+    if (isLoading) return; // Hindari proses jika sedang loading
+    setState(() {
+      isLoading = true; // Tampilkan indikator loading
+    });
+
     try {
       await _auth.signInWithEmailAndPassword(
         email: emailController.text,
@@ -42,18 +48,26 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
             content: Text('Incorrect email or password'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
-      );
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        isLoading = false; // Matikan indikator loading setelah proses selesai
+      });
     }
   }
 
   bool _isLoginButtonEnabled() {
     return emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty;
+        passwordController.text.isNotEmpty &&
+        !isLoading; // Tambahkan pengecekan loading
   }
 
   @override
@@ -191,24 +205,28 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       onPressed: _isLoginButtonEnabled()
                           ? _signInWithEmailAndPassword
-                          : null,
+                          : null, // Disable tombol jika tidak memenuhi syarat
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size(350, 60),
-                        side: const BorderSide(color: Colors.grey),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         backgroundColor: const Color(0xFF052135),
                       ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: isLoading
+                          ? CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ) // Tampilkan indikator loading
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(

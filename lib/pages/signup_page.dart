@@ -11,6 +11,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   bool passwordVisible = false;
   bool termsAccepted = false;
+  bool isLoading = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -37,6 +38,11 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<void> _signUpWithEmailAndPassword() async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
+
     if (passwordController.text.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -45,6 +51,9 @@ class _SignUpPageState extends State<SignUpPage> {
           duration: Duration(seconds: 2),
         ),
       );
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
 
@@ -77,13 +86,19 @@ class _SignUpPageState extends State<SignUpPage> {
         );
       } catch (e) {
         print('Error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Invalid email'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,6 +108,9 @@ class _SignUpPageState extends State<SignUpPage> {
           duration: Duration(seconds: 2),
         ),
       );
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -102,7 +120,8 @@ class _SignUpPageState extends State<SignUpPage> {
         passwordController.text.isNotEmpty &&
         confirmPasswordController.text.isNotEmpty &&
         passwordController.text == confirmPasswordController.text &&
-        termsAccepted;
+        termsAccepted &&
+        !isLoading;
   }
 
   @override
@@ -309,15 +328,20 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         backgroundColor: const Color(0xFF052135),
                       ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: isLoading
+                          ? CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
 
                     Padding(

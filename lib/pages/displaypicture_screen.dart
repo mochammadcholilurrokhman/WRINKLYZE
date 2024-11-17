@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image/image.dart' as img;
 
 class DisplayPictureScreen extends StatefulWidget {
   final File imageFile;
@@ -34,7 +35,24 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
             .ref()
             .child('user_uploads/${user.uid}/$fileName');
 
-        final uploadTask = await ref.putFile(widget.imageFile);
+        File fileToUpload = widget.imageFile;
+
+        if (widget.isFrontCamera) {
+          final originalImageBytes = await fileToUpload.readAsBytes();
+          final originalImage = img.decodeImage(originalImageBytes);
+          if (originalImage != null) {
+            final mirroredImage = img.flipHorizontal(originalImage);
+            final mirroredImageBytes = img.encodeJpg(mirroredImage);
+
+            final tempDir = Directory.systemTemp;
+            final mirroredFile = File('${tempDir.path}/$fileName');
+            await mirroredFile.writeAsBytes(mirroredImageBytes);
+
+            fileToUpload = mirroredFile;
+          }
+        }
+
+        final uploadTask = await ref.putFile(fileToUpload);
         final downloadUrl = await uploadTask.ref.getDownloadURL();
 
         setState(() {
