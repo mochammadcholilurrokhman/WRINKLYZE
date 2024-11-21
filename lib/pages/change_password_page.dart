@@ -176,6 +176,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2)),
       );
+      Navigator.of(context).pop();
     } catch (e) {
       print("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(

@@ -66,7 +66,12 @@ class _AccountPageState extends State<AccountPage> {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/images/profile.png'),
+                    backgroundColor: Colors.grey[200],
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.blue,
+                      size: 60,
+                    ),
                   ),
                   SizedBox(width: 20),
                   Flexible(
@@ -122,8 +127,7 @@ class _AccountPageState extends State<AccountPage> {
                     title: Text(
                       'Profile',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
                     ),
                     trailing: Icon(Icons.arrow_forward_ios, size: 20),
                     onTap: () {
@@ -146,7 +150,8 @@ class _AccountPageState extends State<AccountPage> {
                     title: Text(
                       'Change Password',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                     trailing: Icon(Icons.arrow_forward_ios, size: 20),
@@ -163,7 +168,8 @@ class _AccountPageState extends State<AccountPage> {
                     title: Text(
                       'About the App',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                     trailing: Icon(Icons.arrow_forward_ios, size: 20),
@@ -240,7 +246,6 @@ class _AccountPageState extends State<AccountPage> {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
-                                fontSize: 16,
                                 color: Colors.red,
                               ),
                             ),

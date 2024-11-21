@@ -229,19 +229,17 @@ class _CameraPageState extends State<CameraPage> {
                       if (_cameraController!.value.isInitialized) {
                         final XFile image =
                             await _cameraController!.takePicture();
-                        if (image != null) {
-                          final File savedFile = await _saveImageLocally(image);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DisplayPictureScreen(
-                                imageFile: savedFile,
-                                isFrontCamera:
-                                    _selectedCameraIndex == _frontCameraIndex,
-                              ),
+                        final File savedFile = await _saveImageLocally(image);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DisplayPictureScreen(
+                              imageFile: savedFile,
+                              isFrontCamera:
+                                  _selectedCameraIndex == _frontCameraIndex,
                             ),
-                          );
-                        }
+                          ),
+                        );
                       }
                     } catch (e) {
                       print("Error capturing image: $e");

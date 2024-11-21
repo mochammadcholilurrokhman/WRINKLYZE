@@ -21,32 +21,86 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _setDefaultValues() async {
     User? user = _auth.currentUser;
-    setState(() {
-      usernameController.text = user?.displayName ?? 'User';
-    });
+
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        usernameController.text = user.displayName ?? 'User';
+        dobController.text = userDoc['date_of_birth'] ?? '';
+        selectedGender = userDoc['gender'] ?? '';
+      });
+    }
   }
 
   Future<void> _saveProfileChanges() async {
-    String newUsername = usernameController.text;
+    String newUsername = usernameController.text.trim();
+    String dob = dobController.text.trim();
+    String? gender = selectedGender;
     User? user = _auth.currentUser;
 
-    if (user != null) {
-      await user.updateDisplayName(newUsername);
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({'username': newUsername});
-
+    // Validasi input
+    if (dob.isEmpty || gender == null || gender.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Profile updated successfully!'),
-          backgroundColor: Colors.green,
+          content: Text('Please fill out all fields before saving.'),
+          backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),
       );
+      return;
+    }
 
-      Navigator.of(context).pop(newUsername);
+    if (user != null) {
+      try {
+        await user.updateDisplayName(newUsername);
+
+        final userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+        await userDocRef.set({
+          'username': newUsername,
+          'date_of_birth': dob,
+          'gender': gender,
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        Navigator.of(context).pop(newUsername);
+      } catch (e) {
+        print("Error updating profile: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to update profile. Please try again.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        dobController.text =
+            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      });
     }
   }
 
@@ -57,7 +111,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -90,46 +144,108 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     color: Colors.grey[700],
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    // Add functionality to change picture
-                  },
-                  child: const Text(
-                    'Change Picture',
-                    style: TextStyle(
-                      color: Color(0xFF1E88E5),
-                      fontSize: 16,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 30),
+
                 _buildTextField(
                   controller: usernameController,
                   labelText: 'Username',
                   width: textFieldWidth,
                 ),
                 const SizedBox(height: 20),
-                _buildTextField(
-                  controller: dobController,
-                  labelText: 'Date of Birth',
-                  width: textFieldWidth,
-                  keyboardType: TextInputType.datetime,
-                  suffixIcon: Icon(Icons.calendar_today),
+
+                GestureDetector(
+                  onTap: () {
+                    _selectDate(context);
+                  },
+                  child: Container(
+                    width: textFieldWidth,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: dobController,
+                              readOnly: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Date of Birth',
+                                hintText: 'DD/MM/YYYY',
+                                labelStyle: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                  color: Color(0xFF797979),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.calendar_today),
+                            color: const Color(0xFF797979),
+                            onPressed: () {
+                              _selectDate(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
-                _buildDropdownField(
+
+                // Gender Dropdown
+                Container(
                   width: textFieldWidth,
-                  labelText: 'Gender',
-                  items: ['Male', 'Female', 'Other'],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedGender = value;
-                    });
-                  },
-                  value: selectedGender,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButtonFormField<String>(
+                      value: selectedGender,
+                      decoration: const InputDecoration(
+                        labelText: 'Gender',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 16,
+                          color: Color(0xFF797979),
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      icon: const Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Icon(
+                          Icons.arrow_drop_down,
+                          color: Color(0xFF797979),
+                        ),
+                      ),
+                      items: ['Male', 'Female']
+                          .map((String value) => DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              ))
+                          .toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedGender = newValue;
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 30),
+
                 ElevatedButton(
                   onPressed: _saveProfileChanges,
                   style: ElevatedButton.styleFrom(
