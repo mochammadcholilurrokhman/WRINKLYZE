@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -48,6 +50,32 @@ class _CameraPageState extends State<CameraPage> {
   void initState() {
     super.initState();
     initializeCameras();
+  }
+
+  Future<void> uploadImageToFlask(File imageFile) async {
+    try {
+      // Endpoint Flask API
+      final uri = Uri.parse('http://192.168.180.155:5000/upload_file');
+      final url = Uri.parse("http://127.0.0.1:5000/upload_file");
+
+      // Buat request multipart
+      final request = http.MultipartRequest('POST', uri);
+      request.files
+          .add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+      // Kirim request
+      final response = await request.send();
+
+      // Cek hasil
+      if (response.statusCode == 200) {
+        final responseData = await http.Response.fromStream(response);
+        print('Upload successful: ${responseData.body}');
+      } else {
+        print('Upload failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
   }
 
   Future<void> initializeCameras() async {
@@ -230,6 +258,11 @@ class _CameraPageState extends State<CameraPage> {
                         final XFile image =
                             await _cameraController!.takePicture();
                         final File savedFile = await _saveImageLocally(image);
+
+                        // Panggil fungsi upload
+                        await uploadImageToFlask(savedFile);
+
+                        // Navigasi ke layar berikutnya
                         Navigator.push(
                           context,
                           MaterialPageRoute(
