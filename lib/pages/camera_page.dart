@@ -52,26 +52,54 @@ class _CameraPageState extends State<CameraPage> {
     initializeCameras();
   }
 
-  Future<void> uploadImageToFlask(File imageFile) async {
+  Future<void> uploadImageToFlask(BuildContext context, File imageFile) async {
     try {
-      // Endpoint Flask API
-      final uri = Uri.parse('http://192.168.180.155:5000/upload_file');
-      final url = Uri.parse("http://127.0.0.1:5000/upload_file");
+      final uri = Uri.parse(
+          'http://192.168.76.155:5000/upload_file'); // ganti sesuai ip masing-masing
 
-      // Buat request multipart
-      final request = http.MultipartRequest('POST', uri);
+      if (!await imageFile.exists()) {
+        print('File does not exist.');
+        return;
+      }
+
+      var request = http.MultipartRequest('POST', uri);
       request.files
           .add(await http.MultipartFile.fromPath('file', imageFile.path));
 
-      // Kirim request
-      final response = await request.send();
+      var response = await request.send();
 
-      // Cek hasil
       if (response.statusCode == 200) {
-        final responseData = await http.Response.fromStream(response);
-        print('Upload successful: ${responseData.body}');
+        var responseData = await http.Response.fromStream(response);
+        Map<String, dynamic> data = json.decode(responseData.body);
+
+        String prediction = data['prediction'] ?? 'Unknown';
+        double confidence = (data['confidence'] ?? 0.0).toDouble();
+
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Prediction Result"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Prediction: $prediction'),
+                  Text('Confidence: ${confidence.toStringAsFixed(2)}'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       } else {
-        print('Upload failed: ${response.statusCode}');
+        print('Upload failed with status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error uploading image: $e');
@@ -259,10 +287,9 @@ class _CameraPageState extends State<CameraPage> {
                             await _cameraController!.takePicture();
                         final File savedFile = await _saveImageLocally(image);
 
-                        // Panggil fungsi upload
-                        await uploadImageToFlask(savedFile);
+                        // Call the upload function
+                        await uploadImageToFlask(context, savedFile);
 
-                        // Navigasi ke layar berikutnya
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -273,15 +300,47 @@ class _CameraPageState extends State<CameraPage> {
                             ),
                           ),
                         );
+
+                        // Optionally navigate to another screen
                       }
                     } catch (e) {
                       print("Error capturing image: $e");
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content: Text(
-                                "Failed to capture image. Please try again.")),
+                          content: Text(
+                              "Failed to capture or upload image. Please try again."),
+                        ),
                       );
                     }
+                    // try {
+                    //   if (_cameraController!.value.isInitialized) {
+                    //     final XFile image =
+                    //         await _cameraController!.takePicture();
+                    //     final File savedFile = await _saveImageLocally(image);
+
+                    //     // Panggil fungsi upload
+                    //     await uploadImageToFlask(savedFile);
+
+                    //     // Navigasi ke layar berikutnya
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => DisplayPictureScreen(
+                    //           imageFile: savedFile,
+                    //           isFrontCamera:
+                    //               _selectedCameraIndex == _frontCameraIndex,
+                    //         ),
+                    //       ),
+                    //     );
+                    //   }
+                    // } catch (e) {
+                    //   print("Error capturing image: $e");
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //         content: Text(
+                    //             "Failed to capture image. Please try again.")),
+                    //   );
+                    // }
                   },
                   child: Stack(
                     alignment: Alignment.center,
