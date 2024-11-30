@@ -55,7 +55,7 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> uploadImageToFlask(BuildContext context, File imageFile) async {
     try {
       final uri = Uri.parse(
-          'http://192.168.76.155:5000/upload_file'); // ganti sesuai ip masing-masing
+          'http://192.168.1.12:5000/upload_file'); // ganti sesuai ip masing-masing
 
       if (!await imageFile.exists()) {
         print('File does not exist.');
