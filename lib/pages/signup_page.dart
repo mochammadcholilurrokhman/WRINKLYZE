@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wrinklyze_6/pages/login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wrinklyze_6/bloc/sign_up/sign_up_bloc.dart';
+import 'package:wrinklyze_6/bloc/sign_up/sign_up_event.dart';
+import 'package:wrinklyze_6/bloc/sign_up/sign_up_state.dart';
+import 'package:wrinklyze_6/pages/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -9,446 +13,329 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  bool passwordVisible = false;
-  bool termsAccepted = false;
-  bool isLoading = false;
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late TextEditingController _usernameController;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _confirmPasswordController;
 
   @override
   void initState() {
     super.initState();
-    passwordVisible = true;
+    _usernameController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
   }
 
-  Future<void> _createUserDocument(User user) async {
-    await _firestore.collection('users').doc(user.uid).set({
-      'username': usernameController.text.trim(),
-      'email': user.email,
-      'profilePic': user.photoURL ?? '',
-      'createdAt': Timestamp.now(),
-      'lastLogin': Timestamp.now(),
-    });
-  }
-
-  Future<void> _signUpWithEmailAndPassword() async {
-    if (isLoading) return;
-    setState(() {
-      isLoading = true;
-    });
-
-    if (passwordController.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Your password should be at least 8 characters long'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    if (passwordController.text == confirmPasswordController.text) {
-      try {
-        UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
-
-        await userCredential.user?.updateDisplayName(
-          usernameController.text.trim(),
-        );
-
-        await _createUserDocument(userCredential.user!);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account created successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-          (Route<dynamic> route) => false,
-        );
-      } catch (e) {
-        print('Error: $e');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Invalid email'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  bool _isSignUpButtonEnabled() {
-    return usernameController.text.isNotEmpty &&
-        emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty &&
-        confirmPasswordController.text.isNotEmpty &&
-        passwordController.text == confirmPasswordController.text &&
-        termsAccepted &&
-        !isLoading;
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 66.0),
-              child: Center(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 5),
-                    const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF052135),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    // Username TextField
-                    Container(
-                      width: 350,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: TextField(
-                          controller: usernameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Username',
-                            labelStyle: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 16,
-                              color: Color(0xFF797979),
-                            ),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Email TextField
-                    Container(
-                      width: 350,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: TextField(
-                          controller: emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 16,
-                              color: Color(0xFF797979),
-                            ),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Password TextField
-                    Container(
-                      width: 350,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: TextField(
-                              controller: passwordController,
-                              keyboardType: TextInputType.text,
-                              obscureText: passwordVisible,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                labelStyle: const TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: 16,
-                                  color: Color(0xFF797979),
-                                ),
-                                border: InputBorder.none,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    passwordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: const Color(0xFF797979),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      passwordVisible = !passwordVisible;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Confirm Password TextField
-                    Container(
-                      width: 350,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: TextField(
-                              controller: confirmPasswordController,
-                              keyboardType: TextInputType.text,
-                              obscureText: passwordVisible,
-                              decoration: InputDecoration(
-                                labelText: 'Confirm Password',
-                                labelStyle: const TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: 16,
-                                  color: Color(0xFF797979),
-                                ),
-                                border: InputBorder.none,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    passwordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: const Color(0xFF797979),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      passwordVisible = !passwordVisible;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Terms and Conditions Checkbox
-                    Container(
-                      width: 350,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: termsAccepted,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                termsAccepted = value!;
-                              });
-                            },
-                          ),
-                          const Text(
-                            'I have read and agree to the Terms \nand Conditions',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 14,
-                              color: Color(0xFF797979),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _isSignUpButtonEnabled()
-                          ? _signUpWithEmailAndPassword
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(350, 60),
-                        side: const BorderSide(color: Colors.grey),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        backgroundColor: const Color(0xFF052135),
-                      ),
-                      child: isLoading
-                          ? CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            )
-                          : const Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
+    return BlocProvider(
+      create: (context) =>
+          SignUpBloc(FirebaseAuth.instance, FirebaseFirestore.instance),
+      child: Scaffold(
+        body: BlocBuilder<SignUpBloc, SignUpState>(
+          builder: (context, state) {
+            final bloc = context.read<SignUpBloc>();
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40.0, vertical: 8.0),
-                      child: Row(
+            if (state.errorMessage != null) {
+              Future.microtask(() {
+                final snackBar = SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: Colors.red,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              });
+            }
+
+            if (state.isSuccess) {
+              Future.microtask(() {
+                final snackBar = SnackBar(
+                  content: const Text('Account has been successfully created.'),
+                  backgroundColor: Colors.green,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              });
+            }
+
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 66.0),
+                    child: Center(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Container(
-                              height: 3,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              'or',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16,
-                                color: Color(0xFF797979),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 3,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Google login logic (to be implemented)
-                      },
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: const Size(350, 60),
-                        side: const BorderSide(color: Colors.grey),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        backgroundColor: Colors.white,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/google_icon.png',
-                            width: 25,
-                            height: 25,
-                          ),
-                          const SizedBox(width: 10),
+                          const SizedBox(height: 5),
                           const Text(
-                            'Continue with Google',
+                            'Sign Up',
                             style: TextStyle(
                               fontFamily: 'Poppins',
-                              fontSize: 16,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
                               color: Color(0xFF052135),
                             ),
                           ),
+                          const SizedBox(height: 50),
+
+                          // Username TextField
+                          _buildTextField(
+                            labelText: 'Username',
+                            controller: _usernameController,
+                            onChanged: (value) =>
+                                bloc.add(SignUpUsernameChanged(value)),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Email TextField
+                          _buildTextField(
+                            labelText: 'Email',
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            onChanged: (value) =>
+                                bloc.add(SignUpEmailChanged(value)),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Password TextField
+                          _buildTextField(
+                            labelText: 'Password',
+                            controller: _passwordController,
+                            obscureText: true,
+                            onChanged: (value) =>
+                                bloc.add(SignUpPasswordChanged(value)),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Confirm Password TextField
+                          _buildTextField(
+                            labelText: 'Confirm Password',
+                            controller: _confirmPasswordController,
+                            obscureText: true,
+                            onChanged: (value) =>
+                                bloc.add(SignUpConfirmPasswordChanged(value)),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Terms and Conditions Checkbox
+                          Container(
+                            width: 360,
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: state.termsAccepted,
+                                  onChanged: (value) => bloc
+                                      .add(SignUpTermsAcceptedToggled(value!)),
+                                ),
+                                const Text(
+                                  'I have read and agree to the Terms \nand Conditions',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 14,
+                                    color: Color(0xFF797979),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Sign Up Button
+                          ElevatedButton(
+                            onPressed: state.isSignUpButtonEnabled
+                                ? () => bloc.add(SignUpSubmitted())
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(350, 60),
+                              side: const BorderSide(color: Colors.grey),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              backgroundColor: const Color(0xFF052135),
+                            ),
+                            child: state.isLoading
+                                ? CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
+                                : const Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+
+                          // Divider with "or"
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40.0, vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 3,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Text(
+                                    'or',
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                      color: Color(0xFF797979),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 3,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Google Sign-In Button
+                          ElevatedButton(
+                            onPressed: () {
+                              // Google login logic (to be implemented)
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(350, 60),
+                              side: const BorderSide(color: Colors.grey),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              backgroundColor: Colors.white,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/google_icon.png',
+                                  width: 25,
+                                  height: 25,
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Continue with Google',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16,
+                                    color: Color(0xFF052135),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Already have an account
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40.0, vertical: 0.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Already have an account? ',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 16,
+                                    color: Color(0xFF797979),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                      color: Color(0xFF052135),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40.0, vertical: 0.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Already have an account? ',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 16,
-                              color: Color(0xFF797979),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                            },
-                            child: const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16,
-                                color: Color(0xFF052135),
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-              ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String labelText,
+    required TextEditingController controller,
+    required Function(String) onChanged,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+  }) {
+    return Container(
+      width: 350,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            labelText: labelText,
+            labelStyle: const TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 16,
+              color: Color(0xFF797979),
             ),
+            border: InputBorder.none,
           ),
-        ],
+        ),
       ),
     );
   }

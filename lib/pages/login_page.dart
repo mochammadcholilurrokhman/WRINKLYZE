@@ -131,11 +131,11 @@ class LoginPage extends StatelessWidget {
 
                           const SizedBox(height: 10),
                           Padding(
-                            padding: const EdgeInsets.only(right: 20.0),
+                            padding: const EdgeInsets.only(right: 25.0),
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
+                              child: GestureDetector(
+                                onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -154,6 +154,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: state.isSubmitting
                                 ? null
