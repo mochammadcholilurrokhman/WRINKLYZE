@@ -67,9 +67,7 @@ class FaceScanResultPage extends StatelessWidget {
             SizedBox(height: 16),
             Image.network(
               imagePath,
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
