@@ -1,36 +1,18 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'displaypicture_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as p;
 
 class CameraPage extends StatefulWidget {
   @override
   _CameraPageState createState() => _CameraPageState();
-}
-
-class OvalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addOval(Rect.fromCenter(
-        center: Offset(size.width / 2, size.height / 2),
-        width: size.width * 0.8,
-        height: size.height * 0.7,
-      ))
-      ..fillType = PathFillType.evenOdd;
-    return path;
-  }
-
-  @override
-  bool shouldReclip(OvalClipper oldClipper) => false;
 }
 
 class _CameraPageState extends State<CameraPage> {
@@ -43,8 +25,6 @@ class _CameraPageState extends State<CameraPage> {
   bool _isCameraSwitching = false;
 
   final ImagePicker _imagePicker = ImagePicker();
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -52,57 +32,70 @@ class _CameraPageState extends State<CameraPage> {
     initializeCameras();
   }
 
-  Future<void> uploadImageToFlask(BuildContext context, File imageFile) async {
+  Future<File> _saveImageLocally(XFile imageFile) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final filePath = p.join(appDir.path, fileName);
+
+    return File(filePath)..writeAsBytes(await imageFile.readAsBytes());
+  }
+
+  Future<void> takePicture(BuildContext context) async {
+    final controller = _cameraController;
+
+    if (controller == null || !controller.value.isInitialized) {
+      print('Error: Camera not initialized.');
+      return;
+    }
+
     try {
-      final uri = Uri.parse(
-          'http://192.168.1.12:5000/upload_file'); // ganti sesuai ip masing-masing
+      final image = await controller.takePicture();
+      print('Image captured: ${image.path}');
 
-      if (!await imageFile.exists()) {
-        print('File does not exist.');
-        return;
-      }
-
-      var request = http.MultipartRequest('POST', uri);
-      request.files
-          .add(await http.MultipartFile.fromPath('file', imageFile.path));
-
-      var response = await request.send();
-
-      if (response.statusCode == 200) {
-        var responseData = await http.Response.fromStream(response);
-        Map<String, dynamic> data = json.decode(responseData.body);
-
-        String prediction = data['prediction'] ?? 'Unknown';
-        double confidence = (data['confidence'] ?? 0.0).toDouble();
-
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Prediction Result"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Prediction: $prediction'),
-                  Text('Confidence: ${confidence.toStringAsFixed(2)}'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        print('Upload failed with status code: ${response.statusCode}');
-      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(
+            imageFile: File(image.path),
+            isFrontCamera: _selectedCameraIndex == 1,
+          ),
+        ),
+      );
     } catch (e) {
-      print('Error uploading image: $e');
+      print('Error capturing image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to capture image. Please try again."),
+        ),
+      );
+    }
+  }
+
+  Future<void> pickImageFromGallery(BuildContext context) async {
+    final pickedFile =
+        await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      print('Image selected: ${imageFile.path}');
+
+      final localImageFile = await _saveImageLocally(pickedFile);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(
+            imageFile: localImageFile,
+            isFrontCamera: false,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("No image selected."),
+        ),
+      );
     }
   }
 
@@ -170,57 +163,6 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
-  Future<File> _saveImageLocally(XFile imageFile) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final filePath = p.join(appDir.path, fileName);
-
-    return File(filePath)..writeAsBytes(await imageFile.readAsBytes());
-  }
-
-  Future<String?> _uploadToFirebaseStorage(File imageFile) async {
-    try {
-      final ref = _storage
-          .ref()
-          .child('images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-
-      final uploadTask = await ref.putFile(imageFile);
-      return await uploadTask.ref.getDownloadURL();
-    } catch (e) {
-      print('Failed to upload to Firebase Storage: $e');
-      return null;
-    }
-  }
-
-  Future<void> pickImageFromGallery() async {
-    User? user = _auth.currentUser;
-
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You need to be logged in to upload images')),
-      );
-      return;
-    }
-
-    final XFile? image =
-        await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      final File savedFile = await _saveImageLocally(image);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-            imageFile: savedFile,
-            isFrontCamera: false,
-          ),
-        ),
-      );
-    } else {
-      print("No image selected");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,14 +198,6 @@ class _CameraPageState extends State<CameraPage> {
                           ),
                         ),
                       ),
-                      Positioned.fill(
-                        child: ClipPath(
-                          clipper: OvalClipper(),
-                          child: Container(
-                            color: Colors.black.withOpacity(0.7),
-                          ),
-                        ),
-                      ),
                     ],
                   )
                 : Center(child: CircularProgressIndicator()),
@@ -275,73 +209,12 @@ class _CameraPageState extends State<CameraPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 IconButton(
-                  onPressed: pickImageFromGallery,
+                  onPressed: () => pickImageFromGallery(context),
                   icon: Icon(Icons.photo_library, color: Colors.white),
                   iconSize: 40,
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    try {
-                      if (_cameraController!.value.isInitialized) {
-                        final XFile image =
-                            await _cameraController!.takePicture();
-                        final File savedFile = await _saveImageLocally(image);
-
-                        // Call the upload function
-                        await uploadImageToFlask(context, savedFile);
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DisplayPictureScreen(
-                              imageFile: savedFile,
-                              isFrontCamera:
-                                  _selectedCameraIndex == _frontCameraIndex,
-                            ),
-                          ),
-                        );
-
-                        // Optionally navigate to another screen
-                      }
-                    } catch (e) {
-                      print("Error capturing image: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              "Failed to capture or upload image. Please try again."),
-                        ),
-                      );
-                    }
-                    // try {
-                    //   if (_cameraController!.value.isInitialized) {
-                    //     final XFile image =
-                    //         await _cameraController!.takePicture();
-                    //     final File savedFile = await _saveImageLocally(image);
-
-                    //     // Panggil fungsi upload
-                    //     await uploadImageToFlask(savedFile);
-
-                    //     // Navigasi ke layar berikutnya
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => DisplayPictureScreen(
-                    //           imageFile: savedFile,
-                    //           isFrontCamera:
-                    //               _selectedCameraIndex == _frontCameraIndex,
-                    //         ),
-                    //       ),
-                    //     );
-                    //   }
-                    // } catch (e) {
-                    //   print("Error capturing image: $e");
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //         content: Text(
-                    //             "Failed to capture image. Please try again.")),
-                    //   );
-                    // }
-                  },
+                  onTap: () => takePicture(context),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [

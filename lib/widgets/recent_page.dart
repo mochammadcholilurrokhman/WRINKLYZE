@@ -30,10 +30,15 @@ class RecentFile extends StatelessWidget {
           .collection('captures')
           .doc(captureId);
 
+      print('Attempting to delete document at: ${captureDocPath.path}');
+
       final docSnapshot = await captureDocPath.get();
       if (!docSnapshot.exists) {
         throw Exception("Capture document not found");
       }
+
+      String imagePath = docSnapshot['imagePath'];
+      print('Image path to delete: $imagePath');
 
       await captureDocPath.delete();
 

@@ -1,55 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/pages/about_page.dart';
 import 'package:wrinklyze_6/pages/change_password_page.dart';
 import 'package:wrinklyze_6/pages/change_profile_page.dart';
 import 'package:wrinklyze_6/pages/login_page.dart';
+import 'package:wrinklyze_6/providers/account_provider.dart';
 
-class AccountPage extends StatefulWidget {
+class AccountPage extends ConsumerWidget {
   @override
-  _AccountPageState createState() => _AccountPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userData = ref.watch(userProvider);
 
-class _AccountPageState extends State<AccountPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  String userEmail = '';
-  String userName = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentUserEmail();
-    _getCurrentUserName();
-  }
-
-  Future<void> _getCurrentUserEmail() async {
-    User? user = _auth.currentUser;
-    if (mounted) {
-      setState(() {
-        userEmail = user?.email ?? 'Not logged in';
-      });
-    }
-  }
-
-  Future<void> _getCurrentUserName() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      if (mounted) {
-        setState(() {
-          userName = doc['username'] ?? '';
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
@@ -80,7 +42,7 @@ class _AccountPageState extends State<AccountPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          userName,
+                          userData?.username ?? '',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 25,
@@ -91,7 +53,7 @@ class _AccountPageState extends State<AccountPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          userEmail,
+                          userData?.email ?? 'Not logged in',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 14,
@@ -107,7 +69,6 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             SizedBox(height: 20),
-
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16.0),
               padding: EdgeInsets.all(16.0),
@@ -138,9 +99,9 @@ class _AccountPageState extends State<AccountPage> {
                       ).then((updatedUsername) {
                         if (updatedUsername != null &&
                             updatedUsername is String) {
-                          setState(() {
-                            userName = updatedUsername;
-                          });
+                          ref
+                              .read(userProvider.notifier)
+                              .updateUsername(updatedUsername);
                         }
                       });
                     },
@@ -184,8 +145,6 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             SizedBox(height: 20),
-
-            // Log Out
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16.0),
               width: double.infinity,
@@ -200,7 +159,7 @@ class _AccountPageState extends State<AccountPage> {
                         ),
                         backgroundColor: Colors.blueGrey[50],
                         title: Text(
-                          'Confirm Logout',
+                          'Logout Confirmation',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.bold,
@@ -209,10 +168,10 @@ class _AccountPageState extends State<AccountPage> {
                           ),
                         ),
                         content: Text(
-                          'Are you sure to log out?                 ',
+                          'Are you sure you want to log out?',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 16,
+                            fontSize: 15,
                             color: Colors.blueGrey[600],
                           ),
                         ),
@@ -226,7 +185,6 @@ class _AccountPageState extends State<AccountPage> {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
-                                fontSize: 16,
                                 color: Colors.blueGrey[600],
                               ),
                             ),
@@ -234,7 +192,7 @@ class _AccountPageState extends State<AccountPage> {
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
-                              _auth.signOut();
+                              FirebaseAuth.instance.signOut();
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(

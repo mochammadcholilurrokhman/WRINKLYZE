@@ -3,24 +3,6 @@ import 'package:flutter/material.dart';
 class WrinklepediaPage extends StatelessWidget {
   final List<Map<String, dynamic>> wrinkleData = [
     {
-      'title': 'No Wrinkles (Tanpa kerutan)',
-      'image': 'assets/images/no_wrinkles.jpg',
-      'description':
-          'Kulit tanpa kerutan, dengan tanda-tanda penuaan minimal dan tekstur kulit yang masih terjaga baik.',
-      'classification': [
-        'Photoaging ringan',
-        'Perubahan pigmentasi ringan',
-        'Tidak ada tumor kulit',
-        'Kerut minimal'
-      ],
-      'solution': [
-        'Pencegahan dengan perlindungan terhadap sinar matahari (menggunakan tabir surya secara rutin) dan menghindari faktor-faktor yang mempercepat penuaan kulit (seperti merokok dan polusi).',
-        'Pemakaian krim pelembab yang mengandung antioksidan seperti vitamin C, E, dan retinoid untuk mempertahankan elastisitas kulit.',
-        'Menjaga nutrisi dengan diet yang seimbang serta mengonsumsi suplemen antioksidan.',
-        'Rutin berolahraga dan menjaga gaya hidup sehat.'
-      ]
-    },
-    {
       'title': 'Wrinkles in Motion (Kerutan ringan)',
       'image': 'assets/images/wrinkles_in_motion.jpg',
       'description':

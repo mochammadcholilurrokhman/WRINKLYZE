@@ -3,8 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image/image.dart' as img;
-import 'package:wrinklyze_6/pages/face_result_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'face_result_page.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final File imageFile;
@@ -22,6 +26,16 @@ class DisplayPictureScreen extends StatefulWidget {
 
 class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   bool _isUploading = false;
+  String? _predictionResult;
+  String? _predictionDetails;
+
+  Future<File> _saveImageLocally(XFile imageFile) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final filePath = p.join(appDir.path, fileName);
+
+    return File(filePath)..writeAsBytes(await imageFile.readAsBytes());
+  }
 
   Future<String?> _uploadToFirebaseStorage() async {
     setState(() {
@@ -48,35 +62,9 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
           .ref()
           .child('user_uploads/${user.uid}/$fileName');
 
-      File fileToUpload = widget.imageFile;
-
-      if (widget.isFrontCamera) {
-        final originalImageBytes = await fileToUpload.readAsBytes();
-        final originalImage = img.decodeImage(originalImageBytes);
-        if (originalImage != null) {
-          final mirroredImage = img.flipHorizontal(originalImage);
-          final mirroredImageBytes = img.encodeJpg(mirroredImage);
-
-          final tempDir = Directory.systemTemp;
-          final mirroredFile = File('${tempDir.path}/$fileName');
-          await mirroredFile.writeAsBytes(mirroredImageBytes);
-
-          fileToUpload = mirroredFile;
-        }
-      }
-
-      final uploadTask = await ref.putFile(fileToUpload);
-      final downloadUrl = await uploadTask.ref.getDownloadURL();
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('captures')
-          .add({
-        'url': downloadUrl,
-        'filename': fileName,
-        'timestamp': DateTime.now(),
-      });
+      // Upload the image to Firebase Storage
+      await ref.putFile(widget.imageFile);
+      final downloadUrl = await ref.getDownloadURL();
 
       setState(() {
         _isUploading = false;
@@ -92,6 +80,44 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     }
   }
 
+  Future<void> _sendImageToPredictApi(String imageUrl) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.1.13:5000/upload_file'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'image_url': imageUrl}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = jsonDecode(response.body);
+        String skinType = responseJson['prediction'] ?? 'Unknown';
+        double confidence = responseJson['confidence'] ?? 0.0;
+        List<dynamic> probabilities = responseJson['probabilities'] ?? [];
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FaceScanResultPage(
+              skinType: skinType,
+              confidence: confidence,
+              probabilities: probabilities,
+              imagePath: imageUrl,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to get prediction."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error sending image URL to API: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,27 +130,9 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         children: [
           Expanded(
             child: Center(
-              child: AspectRatio(
-                aspectRatio: 4 / 3,
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: widget.isFrontCamera
-                        ? Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.rotationY(3.14159),
-                            child: Image.file(
-                              widget.imageFile,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : Image.file(
-                            widget.imageFile,
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                ),
+              child: Image.file(
+                widget.imageFile,
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -140,17 +148,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                       : () async {
                           final downloadUrl = await _uploadToFirebaseStorage();
                           if (downloadUrl != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FaceScanResultPage(
-                                  skinType: "Wrinkles at Rest (Kerutan Sedang)",
-                                  details:
-                                      "Kerutan tetap terlihat meskipun wajah dalam keadaan rileks. Menunjukkan penuaan yang lebih lanjut.",
-                                  imagePath: downloadUrl,
-                                ),
-                              ),
-                            );
+                            await _sendImageToPredictApi(downloadUrl);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(

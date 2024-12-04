@@ -1,43 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wrinklyze_6/providers/forgot_password_provider.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
+class ForgotPasswordPage extends ConsumerWidget {
   @override
-  _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final forgotPasswordState = ref.watch(forgotPasswordProvider);
+    final forgotPasswordNotifier = ref.read(forgotPasswordProvider.notifier);
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  final TextEditingController emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+    final TextEditingController emailController = TextEditingController();
 
-  Future<void> _sendPasswordResetEmail() async {
-    try {
-      await _auth.sendPasswordResetEmail(email: emailController.text);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('A password reset link has been sent to your email.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.of(context).pop();
-    } on FirebaseAuthException catch (e) {
-      String message;
-      if (e.code == 'user-not-found') {
-        message = 'Email is not registered. Please check and try again.';
-      } else {
-        message = 'Failed to send password reset email. Please try again.';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final double textFieldWidth = MediaQuery.of(context).size.width * 0.9;
 
     return Scaffold(
@@ -83,7 +55,28 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _sendPasswordResetEmail,
+                onPressed: () {
+                  forgotPasswordNotifier
+                      .sendPasswordResetEmail(emailController.text);
+                  if (forgotPasswordState.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(forgotPasswordState.errorMessage!),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else if (!forgotPasswordState.isLoading) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'A password reset link has been sent to your email.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(textFieldWidth, 60),
                   shape: RoundedRectangleBorder(

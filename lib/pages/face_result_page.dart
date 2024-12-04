@@ -5,17 +5,20 @@ import 'package:wrinklyze_6/main.dart';
 
 class FaceScanResultPage extends StatelessWidget {
   final String skinType;
-  final String details;
+  final double confidence;
+  final List<dynamic> probabilities;
   final String imagePath;
 
   const FaceScanResultPage({
     Key? key,
     required this.skinType,
-    required this.details,
+    required this.confidence,
+    required this.probabilities,
     required this.imagePath,
   }) : super(key: key);
 
-  Future<void> _saveToFirestore(BuildContext context) async {
+  Future<void> _saveToFirestore(BuildContext context, String skinType,
+      double confidence, List<dynamic> probabilities, String imagePath) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
@@ -25,7 +28,8 @@ class FaceScanResultPage extends StatelessWidget {
             .collection('face_results')
             .add({
           'skinType': skinType,
-          'details': details,
+          'confidence': confidence,
+          'probabilities': probabilities,
           'imagePath': imagePath,
           'timestamp': DateTime.now(),
         });
@@ -81,12 +85,18 @@ class FaceScanResultPage extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    details,
+                    'Confidence: ${confidence.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Probabilities: ${probabilities.toString()}',
                     style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                   ),
                   SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () => _saveToFirestore(context),
+                    onTap: () => _saveToFirestore(context, skinType, confidence,
+                        probabilities, imagePath),
                     child: Container(
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(

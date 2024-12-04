@@ -1,100 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wrinklyze_6/pages/face_result_page.dart';
 import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wrinklyze_6/providers/home_provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerWidget {
   @override
-  _HomePageState createState() => _HomePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
 
-class _HomePageState extends State<HomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  String userName = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentUserName();
-  }
-
-  Future<void> _getCurrentUserName() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      setState(() {
-        userName = doc['username'] ?? '';
-      });
-    }
-  }
-
-  Future<void> _deleteCapture(
-      BuildContext context, String captureId, String imagePath) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception("User is not logged in");
-      }
-
-      if (captureId.isEmpty) {
-        throw Exception("Capture ID is empty");
-      }
-
-      final captureDocPath = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('captures')
-          .doc(captureId);
-
-      final docSnapshot = await captureDocPath.get();
-      if (!docSnapshot.exists) {
-        throw Exception("Capture document not found");
-      }
-
-      await captureDocPath.delete();
-
-      await FirebaseStorage.instance.refFromURL(imagePath).delete();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Capture deleted successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete capture: $e')),
-      );
-    }
-  }
-
-  Stream<List<Map<String, dynamic>>> _getCapturedImages() {
-    final user = _auth.currentUser;
-    if (user != null) {
-      return FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('captures')
-          .orderBy('timestamp', descending: true)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => {
-                    'captureId': doc.id,
-                    'url': doc['url'],
-                    'filename': doc['filename'],
-                    'timestamp': (doc['timestamp'] as Timestamp).toDate(),
-                  })
-              .toList());
-    }
-    return const Stream.empty();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -110,7 +28,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hi! $userName',
+                      'Hi! ${homeState.userName}',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 22,
@@ -241,50 +159,60 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                        child: StreamBuilder<List<Map<String, dynamic>>>(
-                      stream: _getCapturedImages(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        final captures = snapshot.data!;
-                        return ListView.builder(
-                          padding: const EdgeInsets.all(16.0),
-                          itemCount: captures.length,
-                          itemBuilder: (context, index) {
-                            final capture = captures[index];
-
-                            // Pastikan captureId ada dan tidak null
-                            final captureId = capture['captureId'] ??
-                                ''; // Jika null, gunakan string kosong
-
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FaceScanResultPage(
-                                      skinType:
-                                          "Wrinkles at Rest (Kerutan Sedang)",
-                                      details:
-                                          "Kerutan tetap terlihat meskipun wajah dalam keadaan rileks.",
-                                      imagePath: capture['url'],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: RecentFile(
-                                imagePath: capture['url'],
-                                title: capture['filename'],
-                                date: capture['timestamp'].toString(),
-                                captureId:
-                                    captureId, // Menggunakan captureId yang aman
+                      child: StreamBuilder<List<Map<String, dynamic>>>(
+                        stream:
+                            _getFaceResults(), // Use the new method to get face results
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          final faceResults = snapshot.data!;
+                          if (faceResults.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'No face scan results found.',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
                               ),
                             );
-                          },
-                        );
-                      },
-                    )),
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            itemCount: faceResults.length,
+                            itemBuilder: (context, index) {
+                              final result = faceResults[index];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  // Navigate to FaceScanResultPage
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FaceScanResultPage(
+                                        skinType: result['skinType'],
+                                        confidence: result['confidence'],
+                                        probabilities: result['probabilities'],
+                                        imagePath: result['imagePath'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: RecentFile(
+                                  imagePath: result['imagePath'],
+                                  title: result['skinType'],
+                                  date: result['timestamp'].toString(),
+                                  captureId: result[
+                                      'captureId'], // Ensure you have this field
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -293,5 +221,28 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Stream<List<Map<String, dynamic>>> _getFaceResults() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('face_results')
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => {
+                    'skinType': doc['skinType'],
+                    'confidence': doc['confidence'],
+                    'probabilities': doc['probabilities'],
+                    'imagePath': doc['imagePath'],
+                    'timestamp': (doc['timestamp'] as Timestamp).toDate(),
+                    'captureId': doc.id, // Add captureId here
+                  })
+              .toList());
+    }
+    return const Stream.empty();
   }
 }

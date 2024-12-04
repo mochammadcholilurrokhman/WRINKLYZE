@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'forgot_password_page.dart'; // Import the ForgotPasswordPage
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wrinklyze_6/pages/forgot_password_page.dart';
+import 'package:wrinklyze_6/providers/change_password_provider.dart';
 
-class ChangePasswordPage extends StatefulWidget {
+class ChangePasswordPage extends ConsumerWidget {
   @override
-  _ChangePasswordPageState createState() => _ChangePasswordPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final changePasswordState = ref.watch(changePasswordProvider);
+    final changePasswordNotifier = ref.read(changePasswordProvider.notifier);
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
-  bool newPasswordVisible = false;
-  bool confirmPasswordVisible = false;
-  final TextEditingController currentPasswordController =
-      TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  @override
-  Widget build(BuildContext context) {
     final double textFieldWidth = MediaQuery.of(context).size.width * 0.9;
 
     return Scaffold(
@@ -57,36 +47,32 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
               const SizedBox(height: 20),
               _buildPasswordField(
-                controller: currentPasswordController,
+                controller: changePasswordState.currentPasswordController,
                 labelText: 'Current password',
                 obscureText: true,
                 width: textFieldWidth,
               ),
               const SizedBox(height: 20),
               _buildPasswordField(
-                controller: newPasswordController,
+                controller: changePasswordState.newPasswordController,
                 labelText: 'New password',
-                obscureText: newPasswordVisible,
+                obscureText: !changePasswordState.newPasswordVisible,
                 width: textFieldWidth,
                 toggleVisibility: () {
-                  setState(() {
-                    newPasswordVisible = !newPasswordVisible;
-                  });
+                  changePasswordNotifier.toggleNewPasswordVisibility();
                 },
-                visible: newPasswordVisible,
+                visible: changePasswordState.newPasswordVisible,
               ),
               const SizedBox(height: 20),
               _buildPasswordField(
-                controller: confirmPasswordController,
+                controller: changePasswordState.confirmPasswordController,
                 labelText: 'Confirm new password',
-                obscureText: confirmPasswordVisible,
+                obscureText: !changePasswordState.confirmPasswordVisible,
                 width: textFieldWidth,
                 toggleVisibility: () {
-                  setState(() {
-                    confirmPasswordVisible = !confirmPasswordVisible;
-                  });
+                  changePasswordNotifier.toggleConfirmPasswordVisibility();
                 },
-                visible: confirmPasswordVisible,
+                visible: changePasswordState.confirmPasswordVisible,
               ),
               const SizedBox(height: 10),
               Align(
@@ -111,7 +97,31 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _changePassword,
+                onPressed: () {
+                  changePasswordNotifier.changePassword(
+                    changePasswordState.currentPasswordController.text,
+                    changePasswordState.newPasswordController.text,
+                    changePasswordState.confirmPasswordController.text,
+                  );
+                  if (changePasswordState.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(changePasswordState.errorMessage!),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Password changed successfully'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(textFieldWidth, 60),
                   shape: RoundedRectangleBorder(
@@ -135,57 +145,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         ),
       ),
     );
-  }
-
-  Future<void> _changePassword() async {
-    if (newPasswordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('New password and confirmation do not match'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
-      );
-      return;
-    }
-
-    if (newPasswordController.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('New password should be at least 8 characters long'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
-      );
-      return;
-    }
-
-    try {
-      User? user = _auth.currentUser;
-      String email = user?.email ?? "";
-
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: email,
-        password: currentPasswordController.text,
-      );
-
-      await user?.reauthenticateWithCredential(credential);
-      await user?.updatePassword(newPasswordController.text);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Password changed successfully'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2)),
-      );
-      Navigator.of(context).pop();
-    } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Failed to change password. Please try again.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2)),
-      );
-    }
   }
 
   Widget _buildPasswordField({

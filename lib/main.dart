@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:wrinklyze_6/pages/home_page.dart';
-import 'package:wrinklyze_6/pages/account_page.dart';
-import 'package:wrinklyze_6/pages/camera_page.dart';
-import 'package:wrinklyze_6/pages/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:wrinklyze_6/pages/account_page.dart';
+import 'package:wrinklyze_6/pages/bottom_navbar.dart';
+import 'package:wrinklyze_6/pages/camera_page.dart';
+import 'package:wrinklyze_6/pages/home_page.dart';
 import 'firebase_options.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wrinklyze_6/pages/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -25,9 +30,6 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFFE9EEF0),
         scaffoldBackgroundColor: Color(0xFFE9EEF0),
       ),
-      // home: SignUpPage(),
-      // home: LoginPage(),
-      // home: AccountPage(),
       home: SplashScreen(),
     );
   }
@@ -47,67 +49,24 @@ class _MainPageState extends State<MainPage> {
     AccountPage(),
   ];
 
-  final List<IconData> iconList = [
-    Icons.home_filled,
-    Icons.person,
-  ];
+  void _onCameraTapped() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CameraPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _bottomNavIndex == 1 ? AccountPage() : HomePage(),
-      floatingActionButton: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: FloatingActionButton(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          onPressed: () async {
-            final imagePath = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CameraPage()),
-            );
-            if (imagePath != null) {
-              print('Image captured at path: $imagePath');
-            }
-          },
-          child: Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFF7995A4),
-            ),
-            child: Icon(
-              Icons.camera_alt,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: AnimatedBottomNavigationBar(
-        icons: iconList,
-        activeIndex: _bottomNavIndex,
-        gapLocation: GapLocation.center,
-        notchSmoothness: NotchSmoothness.verySmoothEdge,
-        leftCornerRadius: 0,
-        rightCornerRadius: 0,
-        iconSize: 30,
-        backgroundColor: Colors.white,
-        onTap: (index) {
-          setState(() {
-            _bottomNavIndex = index;
-          });
-        },
-        activeColor: Color(0xFF052135),
-        inactiveColor: Color(0xFF7995A4),
-      ),
+    return BottomNavBar(
+      selectedIndex: _bottomNavIndex,
+      onItemTapped: (index) {
+        setState(() {
+          _bottomNavIndex = index;
+        });
+      },
+      onCameraTapped: _onCameraTapped,
+      pages: _pages,
     );
   }
 }
