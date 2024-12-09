@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wrinklyze_6/main.dart';
+import 'package:intl/intl.dart';
 
 class FaceScanResultPage extends StatelessWidget {
   final String skinType;
   final double confidence;
   final List<dynamic> probabilities;
   final String imagePath;
+  final String title;
 
   const FaceScanResultPage({
     Key? key,
@@ -15,6 +17,7 @@ class FaceScanResultPage extends StatelessWidget {
     required this.confidence,
     required this.probabilities,
     required this.imagePath,
+    required this.title,
   }) : super(key: key);
 
   Future<void> _showPredictionDialog(BuildContext context) {
@@ -48,6 +51,9 @@ class FaceScanResultPage extends StatelessWidget {
 
   Future<void> _saveToFirestore(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
+    DateTime dateTime = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+
     if (user != null) {
       try {
         await FirebaseFirestore.instance
@@ -55,11 +61,12 @@ class FaceScanResultPage extends StatelessWidget {
             .doc(user.uid)
             .collection('face_results')
             .add({
+          'title': title,
           'skinType': skinType,
           'confidence': confidence,
           'probabilities': probabilities,
           'imagePath': imagePath,
-          'timestamp': DateTime.now(),
+          'timestamp': formattedDate,
         });
 
         Navigator.pushAndRemoveUntil(

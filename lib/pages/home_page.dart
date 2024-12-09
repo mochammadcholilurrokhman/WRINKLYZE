@@ -6,6 +6,7 @@ import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/home_provider.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends ConsumerWidget {
   @override
@@ -196,13 +197,14 @@ class HomePage extends ConsumerWidget {
                                         confidence: result['confidence'],
                                         probabilities: result['probabilities'],
                                         imagePath: result['imagePath'],
+                                        title: result['title'],
                                       ),
                                     ),
                                   );
                                 },
                                 child: RecentFile(
                                   imagePath: result['imagePath'],
-                                  title: result['skinType'],
+                                  title: result['title'],
                                   date: result['timestamp'].toString(),
                                   captureId: result['captureId'],
                                   onDelete: () {},
@@ -234,12 +236,13 @@ class HomePage extends ConsumerWidget {
           .snapshots()
           .map((snapshot) => snapshot.docs
               .map((doc) => {
+                    'title': doc['title'],
                     'skinType': doc['skinType'],
                     'confidence': doc['confidence'],
                     'probabilities': doc['probabilities'],
                     'imagePath': doc['imagePath'],
-                    'timestamp': (doc['timestamp'] as Timestamp).toDate(),
-                    'captureId': doc.id, // Add captureId here
+                    'timestamp': doc['timestamp'],
+                    'captureId': doc.id,
                   })
               .toList());
     }

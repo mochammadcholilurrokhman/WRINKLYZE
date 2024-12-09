@@ -82,7 +82,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   Future<void> _sendImageToPredictApi(String imageUrl) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.7:5000/upload_file'),
+        Uri.parse('http://192.168.215.155:5000/upload_file'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'image_url': imageUrl}),
       );
@@ -90,6 +90,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
         String skinType = responseJson['prediction'] ?? 'Unknown';
+        String title = responseJson['title'] ?? 'Unknown';
         double confidence = responseJson['confidence'] ?? 0.0;
         List<dynamic> probabilities = responseJson['probabilities'] ?? [];
 
@@ -97,11 +98,11 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => FaceScanResultPage(
-              skinType: skinType,
-              confidence: confidence,
-              probabilities: probabilities,
-              imagePath: imageUrl,
-            ),
+                skinType: skinType,
+                confidence: confidence,
+                probabilities: probabilities,
+                imagePath: imageUrl,
+                title: title),
           ),
         );
       } else {
