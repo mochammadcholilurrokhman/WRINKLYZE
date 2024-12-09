@@ -87,6 +87,8 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Light.ttf
           weight: 300
+        - asset: assets/fonts/Poppins-Italic.ttf
+          style: italic
 
   # To add assets to your application, add an assets section, like this:
   # assets:

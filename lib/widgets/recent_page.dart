@@ -8,7 +8,7 @@ class RecentFile extends StatelessWidget {
   final String title;
   final String date;
   final String captureId;
-  final VoidCallback onDelete; // Add this line
+  final VoidCallback onDelete;
 
   const RecentFile({
     Key? key,
@@ -16,7 +16,7 @@ class RecentFile extends StatelessWidget {
     required this.title,
     required this.date,
     required this.captureId,
-    required this.onDelete, // Add this line
+    required this.onDelete,
   }) : super(key: key);
 
   Future<void> _deleteCapture(BuildContext context) async {
@@ -29,7 +29,7 @@ class RecentFile extends StatelessWidget {
       final captureDocPath = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .collection('face_results') // Ensure this matches your collection
+          .collection('face_results')
           .doc(captureId);
 
       final docSnapshot = await captureDocPath.get();
@@ -42,7 +42,7 @@ class RecentFile extends StatelessWidget {
       await captureDocPath.delete();
       await FirebaseStorage.instance.refFromURL(imagePath).delete();
 
-      onDelete(); // Call the callback to notify the parent to refresh
+      onDelete();
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

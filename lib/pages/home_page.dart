@@ -160,7 +160,8 @@ class HomePage extends ConsumerWidget {
                     ),
                     Expanded(
                       child: StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: _getFaceResults(),
+                        stream:
+                            _getFaceResults(), // Use the new method to get face results
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(child: CircularProgressIndicator());
@@ -238,7 +239,7 @@ class HomePage extends ConsumerWidget {
                     'probabilities': doc['probabilities'],
                     'imagePath': doc['imagePath'],
                     'timestamp': (doc['timestamp'] as Timestamp).toDate(),
-                    'captureId': doc.id,
+                    'captureId': doc.id, // Add captureId here
                   })
               .toList());
     }
