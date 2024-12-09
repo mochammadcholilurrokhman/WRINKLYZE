@@ -160,8 +160,7 @@ class HomePage extends ConsumerWidget {
                     ),
                     Expanded(
                       child: StreamBuilder<List<Map<String, dynamic>>>(
-                        stream:
-                            _getFaceResults(), // Use the new method to get face results
+                        stream: _getFaceResults(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(child: CircularProgressIndicator());
@@ -204,8 +203,8 @@ class HomePage extends ConsumerWidget {
                                   imagePath: result['imagePath'],
                                   title: result['skinType'],
                                   date: result['timestamp'].toString(),
-                                  captureId: result[
-                                      'captureId'], // Ensure you have this field
+                                  captureId: result['captureId'],
+                                  onDelete: () {},
                                 ),
                               );
                             },
@@ -239,7 +238,7 @@ class HomePage extends ConsumerWidget {
                     'probabilities': doc['probabilities'],
                     'imagePath': doc['imagePath'],
                     'timestamp': (doc['timestamp'] as Timestamp).toDate(),
-                    'captureId': doc.id, // Add captureId here
+                    'captureId': doc.id,
                   })
               .toList());
     }

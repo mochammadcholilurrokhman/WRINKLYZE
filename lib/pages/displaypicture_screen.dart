@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -83,7 +82,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   Future<void> _sendImageToPredictApi(String imageUrl) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.13:5000/upload_file'),
+        Uri.parse('http://192.168.62.155:5000/upload_file'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'image_url': imageUrl}),
       );
