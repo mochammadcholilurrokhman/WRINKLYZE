@@ -25,8 +25,6 @@ class DisplayPictureScreen extends StatefulWidget {
 
 class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   bool _isUploading = false;
-  String? _predictionResult;
-  String? _predictionDetails;
 
   Future<File> _saveImageLocally(XFile imageFile) async {
     final appDir = await getApplicationDocumentsDirectory();
@@ -61,7 +59,6 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
           .ref()
           .child('user_uploads/${user.uid}/$fileName');
 
-      // Upload the image to Firebase Storage
       await ref.putFile(widget.imageFile);
       final downloadUrl = await ref.getDownloadURL();
 
@@ -75,14 +72,20 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         _isUploading = false;
       });
       print("Failed to upload image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to upload image."),
+          backgroundColor: Colors.red,
+        ),
+      );
       return null;
     }
   }
 
-  Future<void> _sendImageToPredictApi(String imageUrl) async {
+  Future<bool> _sendImageToPredictApi(String imageUrl) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.215.155:5000/upload_file'),
+        Uri.parse('http://192.168.1.7:5000/upload_file'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'image_url': imageUrl}),
       );
@@ -105,16 +108,31 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                 title: title),
           ),
         );
+
+        return true;
       } else {
+        final responseJson = jsonDecode(response.body);
+        String errorMessage =
+            responseJson['error'] ?? 'Failed to get prediction.';
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to get prediction."),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
           ),
         );
+
+        return false;
       }
     } catch (e) {
       print('Error sending image URL to API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("An unexpected error occurred. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
     }
   }
 
