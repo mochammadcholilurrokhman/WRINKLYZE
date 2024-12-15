@@ -120,7 +120,8 @@ class _CameraPageState extends State<CameraPage> {
 
     _cameraController = CameraController(
       cameras![cameraIndex],
-      ResolutionPreset.high,
+      // ResolutionPreset.high,
+      ResolutionPreset.medium,
     );
 
     await _cameraController!.initialize();

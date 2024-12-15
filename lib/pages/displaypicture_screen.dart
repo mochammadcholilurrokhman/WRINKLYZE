@@ -52,7 +52,6 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       );
       return null;
     }
-
     try {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final ref = FirebaseStorage.instance

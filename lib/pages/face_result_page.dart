@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wrinklyze_6/main.dart';
 import 'package:intl/intl.dart';
 
+
 class FaceScanResultPage extends StatelessWidget {
   final String skinType;
   final double confidence;
@@ -45,8 +46,7 @@ class FaceScanResultPage extends StatelessWidget {
       },
     );
 
-    return Future
-        .value(); // Indicate that the method has completed successfully
+    return Future.value();
   }
 
   Future<void> _saveToFirestore(BuildContext context) async {
@@ -87,7 +87,6 @@ class FaceScanResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Show the prediction dialog when the page is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showPredictionDialog(context);
     });
@@ -96,7 +95,7 @@ class FaceScanResultPage extends StatelessWidget {
     String description = '';
     switch (skinType) {
       case 'wrinkle_ringan':
-        title = 'Wrinkles in Motion (kerutan ringan)';
+        title = 'Wrinkles in Motion (Kerutan Ringan)';
         description = '''
 Pengertian
 Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.
@@ -115,7 +114,7 @@ Solusi
         ''';
         break;
       case 'wrinkle_sedang':
-        title = 'Wrinkles at Rest (kerutan sedang)';
+        title = 'Wrinkles at Rest (Kerutan Sedang)';
         description = '''
 Pengertian
 Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.
@@ -134,7 +133,7 @@ Solusi
         ''';
         break;
       case 'wrinkle_berat':
-        title = 'Only Wrinkles (kerutan berat)';
+        title = 'Only Wrinkles (Kerutan Berat)';
         description = '''
 Pengertian
 Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.
@@ -167,13 +166,7 @@ Solusi
             color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue[100]!, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: Colors.white,
         child: SingleChildScrollView(
           child: Column(
             children: [
