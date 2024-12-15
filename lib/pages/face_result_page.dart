@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wrinklyze_6/main.dart';
 import 'package:intl/intl.dart';
 
-
 class FaceScanResultPage extends StatelessWidget {
   final String skinType;
   final double confidence;

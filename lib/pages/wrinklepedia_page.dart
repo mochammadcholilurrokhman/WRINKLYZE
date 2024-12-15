@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class WrinklepediaPage extends StatelessWidget {
   final List<Map<String, dynamic>> wrinkleData = [
     {
-      'title': 'Wrinkles in Motion (Kerutan ringan)',
+      'title': 'Wrinkles in Motion (Kerutan Ringan)',
       'image': 'assets/images/wrinkles_in_motion.jpg',
       'description':
           'Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.',
@@ -21,7 +21,7 @@ class WrinklepediaPage extends StatelessWidget {
       ]
     },
     {
-      'title': 'Wrinkles at Rest (Kerutan sedang)',
+      'title': 'Wrinkles at Rest (Kerutan Sedang)',
       'image': 'assets/images/wrinkles_at_rest.jpg',
       'description':
           'Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.',
@@ -39,7 +39,7 @@ class WrinklepediaPage extends StatelessWidget {
       ]
     },
     {
-      'title': 'Only Wrinkles (Kerutan berat)',
+      'title': 'Only Wrinkles (Kerutan Berat)',
       'image': 'assets/images/only_wrinkles.jpg',
       'description':
           'Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.',

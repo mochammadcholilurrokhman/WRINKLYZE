@@ -53,7 +53,7 @@ class _CameraPageState extends State<CameraPage> {
         MaterialPageRoute(
           builder: (context) => DisplayPictureScreen(
             imageFile: File(image.path),
-            isFrontCamera: _selectedCameraIndex == 1,
+            isFrontCamera: _selectedCameraIndex == _frontCameraIndex,
           ),
         ),
       );
@@ -75,13 +75,11 @@ class _CameraPageState extends State<CameraPage> {
       final imageFile = File(pickedFile.path);
       print('Image selected: ${imageFile.path}');
 
-      final localImageFile = await _saveImageLocally(pickedFile);
-
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => DisplayPictureScreen(
-            imageFile: localImageFile,
+            imageFile: imageFile,
             isFrontCamera: false,
           ),
         ),

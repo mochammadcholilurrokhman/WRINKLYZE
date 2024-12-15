@@ -147,10 +147,19 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         children: [
           Expanded(
             child: Center(
-              child: Image.file(
-                widget.imageFile,
-                fit: BoxFit.cover,
-              ),
+              child: widget.isFrontCamera
+                  ? Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(3.14159), // Mirror the image
+                      child: Image.file(
+                        widget.imageFile,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Image.file(
+                      widget.imageFile,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
           Container(
