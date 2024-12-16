@@ -27,17 +27,20 @@ class FaceScanResultPage extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title:
-              Text(dialogTitle, style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(dialogTitle,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                  fontSize: 20)),
           content: SingleChildScrollView(
-            child: Text(content),
+            child: Text(content, style: TextStyle(fontFamily: 'Poppins')),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: Text('Close', style: TextStyle(fontFamily: 'Poppins')),
             ),
           ],
         );
@@ -73,16 +76,16 @@ class FaceScanResultPage extends ConsumerWidget {
 Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.
 
 **Klasifikasi**
-- Photoaging sedang
-- Mulai muncul bercak hitam (hiperpigmentasi)
-- Adanya tumor kulit awal namun tidak tampak secara kasat mata
-- Garis senyum paralel mulai muncul di sisi lateral wajah
+• Photoaging sedang
+• Mulai muncul bercak hitam (hiperpigmentasi)
+• Adanya tumor kulit awal namun tidak tampak secara kasat mata
+• Garis senyum paralel mulai muncul di sisi lateral wajah
 
 **Solusi**
-- Pemakaian krim anti-aging yang mengandung tretinoin atau asam alfa hidroksi untuk mengurangi garis halus dan meningkatkan pergantian sel kulit.
-- Chemical peeling ringan untuk memperbaiki tekstur kulit dan mengurangi perubahan warna.
-- Perawatan kulit rutin dengan pelembab dan tabir surya untuk mencegah kerusakan lebih lanjut akibat sinar UV.
-- Perawatan laser atau IPL untuk mengatasi hiperpigmentasi dan memperbaiki struktur kulit.
+• Pemakaian krim anti-aging yang mengandung tretinoin atau asam alfa hidroksi untuk mengurangi garis halus dan meningkatkan pergantian sel kulit.
+• Chemical peeling ringan untuk memperbaiki tekstur kulit dan mengurangi perubahan warna.
+• Perawatan kulit rutin dengan pelembab dan tabir surya untuk mencegah kerusakan lebih lanjut akibat sinar UV.
+• Perawatan laser atau IPL untuk mengatasi hiperpigmentasi dan memperbaiki struktur kulit.
         ''';
         break;
       case 'wrinkle_sedang':
@@ -92,35 +95,35 @@ Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digu
 Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.
 
 **Klasifikasi**
-- Photoaging berat
-- Diskromia nyata, telangiectasis (pelebaran pembuluh darah kecil)
-- Adanya tumor kulit seperti keratosis
-- Kerut persisten dan dalam
+• Photoaging berat
+• Diskromia nyata, telangiectasis (pelebaran pembuluh darah kecil)
+• Adanya tumor kulit seperti keratosis
+• Kerut persisten dan dalam
 
 **Solusi**
-- Tindakan medis lebih intensif seperti mikrodermabrasi atau laser resurfacing untuk menghilangkan lapisan atas kulit dan merangsang produksi kolagen.
-- Botox atau filler kulit untuk mengatasi kerutan dalam yang tidak hilang dengan krim topikal.
-- Pemakaian krim tretinoin atau retinoid kuat untuk meningkatkan regenerasi kulit dan mengurangi tampilan kerutan.
-- Pemeriksaan rutin ke dokter kulit untuk menangani tumor kulit dan melakukan tindakan pencegahan kanker kulit.
+• Tindakan medis lebih intensif seperti mikrodermabrasi atau laser resurfacing untuk menghilangkan lapisan atas kulit dan merangsang produksi kolagen.
+• Botox atau filler kulit untuk mengatasi kerutan dalam yang tidak hilang dengan krim topikal.
+• Pemakaian krim tretinoin atau retinoid kuat untuk meningkatkan regenerasi kulit dan mengurangi tampilan kerutan.
+• Pemeriksaan rutin ke dokter kulit untuk menangani tumor kulit dan melakukan tindakan pencegahan kanker kulit.
         ''';
         break;
       case 'wrinkle_berat':
-        displayTitle = 'Only Wrinkles (Kerutan Berat)';
+        displayTitle = 'Wrinkles in Motion (Kerutan Ringan)';
         description = '''
 **Pengertian**
 Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.
 
 **Klasifikasi**
-- Photoaging sangat berat
-- Kulit kuning-keabuan
-- Adanya tumor kulit ganas
-- Hampir tidak ada kulit normal yang tersisa
+• Photoaging sangat berat
+• Kulit kuning-keabuan
+• Adanya tumor kulit ganas
+• Hampir tidak ada kulit normal yang tersisa
 
 **Solusi**
-- Pembedahan kosmetik seperti facelift atau browlift untuk memperbaiki kulit yang sangat kendur dan kerut dalam.
-- Perawatan laser intensif untuk meremajakan kulit dan mengatasi hiperpigmentasi dan kerusakan berat akibat sinar matahari.
-- Konsultasi dengan ahli bedah plastik untuk penanganan tumor kulit ganas.
-- Penggunaan krim anti-aging yang kuat serta pengobatan sistemik seperti hormon replacement therapy jika diperlukan.
+• Pembedahan kosmetik seperti facelift atau browlift untuk memperbaiki kulit yang sangat kendur dan kerut dalam.
+• Perawatan laser intensif untuk meremajakan kulit dan mengatasi hiperpigmentasi dan kerusakan berat akibat sinar matahari.
+• Konsultasi dengan ahli bedah plastik untuk penanganan tumor kulit ganas.
+• Penggunaan krim anti-aging yang kuat serta pengobatan sistemik seperti hormon replacement therapy jika diperlukan.
         ''';
         break;
       default:
@@ -130,12 +133,16 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Face Scan Result'),
+        title:
+            Text('Face Scan Result', style: TextStyle(fontFamily: 'Poppins')),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
-            color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins'),
       ),
       body: Container(
         color: Colors.white,
@@ -163,6 +170,7 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                   ),
                 ),
               ),
+              SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -171,15 +179,21 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                     Text(
                       displayTitle,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue[800],
+                        color: Colors.black,
+                        fontFamily: 'Poppins',
                       ),
                     ),
+                    SizedBox(height: 8),
+                    Divider(thickness: 1, color: Colors.grey[300]),
                     SizedBox(height: 16),
                     RichText(
                       text: TextSpan(
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontFamily: 'Poppins'),
                         children: _buildDescriptionText(description),
                       ),
                     ),
@@ -232,10 +246,11 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
       if (line.startsWith('**') && line.endsWith('**')) {
         spans.add(TextSpan(
           text: line.replaceAll('**', ''),
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
         ));
       } else {
-        spans.add(TextSpan(text: line));
+        spans
+            .add(TextSpan(text: line, style: TextStyle(fontFamily: 'Poppins')));
       }
       spans.add(TextSpan(text: '\n'));
     }

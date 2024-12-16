@@ -15,14 +15,14 @@ class AccountPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Color(0xFF6F8A9D),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              color: Colors.blueGrey,
+              color: Color(0xFF6F8A9D),
               padding: EdgeInsets.only(bottom: 50.0, left: 30.0, right: 30.0),
               child: Row(
                 children: [
