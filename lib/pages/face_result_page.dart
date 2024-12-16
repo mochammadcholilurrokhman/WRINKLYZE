@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wrinklyze_6/main.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wrinklyze_6/providers/face_scan_result_provider.dart';
 
-class FaceScanResultPage extends StatelessWidget {
+class FaceScanResultPage extends ConsumerWidget {
   final String skinType;
   final double confidence;
   final List<dynamic> probabilities;
@@ -21,7 +19,7 @@ class FaceScanResultPage extends StatelessWidget {
   }) : super(key: key);
 
   Future<void> _showPredictionDialog(BuildContext context) {
-    String title = 'Skin Type: $skinType';
+    String dialogTitle = 'Skin Type: $skinType';
     String content =
         'Confidence: ${confidence.toStringAsFixed(2)}\n\nProbabilities: ${probabilities.toString()}';
 
@@ -29,7 +27,8 @@ class FaceScanResultPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+          title:
+              Text(dialogTitle, style: TextStyle(fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Text(content),
           ),
@@ -48,64 +47,38 @@ class FaceScanResultPage extends StatelessWidget {
     return Future.value();
   }
 
-  Future<void> _saveToFirestore(BuildContext context) async {
-    final user = FirebaseAuth.instance.currentUser;
-    DateTime dateTime = DateTime.now();
-    String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
-
-    if (user != null) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('face_results')
-            .add({
-          'title': title,
-          'skinType': skinType,
-          'confidence': confidence,
-          'probabilities': probabilities,
-          'imagePath': imagePath,
-          'timestamp': formattedDate,
-        });
-
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => MainPage()),
-          (route) => false,
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to save data: $e"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(faceScanResultProvider.notifier)
+          .setFaceScanResult(FaceScanResult(
+            skinType: skinType,
+            confidence: confidence,
+            probabilities: probabilities,
+            imagePath: imagePath,
+            title: title,
+          ));
       _showPredictionDialog(context);
     });
 
-    String title = '';
     String description = '';
+    String displayTitle = title;
+
     switch (skinType) {
       case 'wrinkle_ringan':
-        title = 'Wrinkles in Motion (Kerutan Ringan)';
+        displayTitle = 'Wrinkles in Motion (Kerutan Ringan)';
         description = '''
-Pengertian
+**Pengertian**
 Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.
 
-Klasifikasi
+**Klasifikasi**
 - Photoaging sedang
 - Mulai muncul bercak hitam (hiperpigmentasi)
 - Adanya tumor kulit awal namun tidak tampak secara kasat mata
 - Garis senyum paralel mulai muncul di sisi lateral wajah
 
-Solusi
+**Solusi**
 - Pemakaian krim anti-aging yang mengandung tretinoin atau asam alfa hidroksi untuk mengurangi garis halus dan meningkatkan pergantian sel kulit.
 - Chemical peeling ringan untuk memperbaiki tekstur kulit dan mengurangi perubahan warna.
 - Perawatan kulit rutin dengan pelembab dan tabir surya untuk mencegah kerusakan lebih lanjut akibat sinar UV.
@@ -113,18 +86,18 @@ Solusi
         ''';
         break;
       case 'wrinkle_sedang':
-        title = 'Wrinkles at Rest (Kerutan Sedang)';
+        displayTitle = 'Wrinkles at Rest (Kerutan Sedang)';
         description = '''
-Pengertian
+**Pengertian**
 Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.
 
-Klasifikasi
+**Klasifikasi**
 - Photoaging berat
 - Diskromia nyata, telangiectasis (pelebaran pembuluh darah kecil)
 - Adanya tumor kulit seperti keratosis
 - Kerut persisten dan dalam
 
-Solusi
+**Solusi**
 - Tindakan medis lebih intensif seperti mikrodermabrasi atau laser resurfacing untuk menghilangkan lapisan atas kulit dan merangsang produksi kolagen.
 - Botox atau filler kulit untuk mengatasi kerutan dalam yang tidak hilang dengan krim topikal.
 - Pemakaian krim tretinoin atau retinoid kuat untuk meningkatkan regenerasi kulit dan mengurangi tampilan kerutan.
@@ -132,18 +105,18 @@ Solusi
         ''';
         break;
       case 'wrinkle_berat':
-        title = 'Only Wrinkles (Kerutan Berat)';
+        displayTitle = 'Only Wrinkles (Kerutan Berat)';
         description = '''
-Pengertian
+**Pengertian**
 Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.
 
-Klasifikasi
+**Klasifikasi**
 - Photoaging sangat berat
 - Kulit kuning-keabuan
 - Adanya tumor kulit ganas
 - Hampir tidak ada kulit normal yang tersisa
 
-Solusi
+**Solusi**
 - Pembedahan kosmetik seperti facelift atau browlift untuk memperbaiki kulit yang sangat kendur dan kerut dalam.
 - Perawatan laser intensif untuk meremajakan kulit dan mengatasi hiperpigmentasi dan kerusakan berat akibat sinar matahari.
 - Konsultasi dengan ahli bedah plastik untuk penanganan tumor kulit ganas.
@@ -151,7 +124,7 @@ Solusi
         ''';
         break;
       default:
-        title = 'Unknown Skin Type';
+        displayTitle = 'Unknown Skin Type';
         description = 'No information available for this skin type.';
     }
 
@@ -196,7 +169,7 @@ Solusi
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      displayTitle,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -204,16 +177,17 @@ Solusi
                       ),
                     ),
                     SizedBox(height: 16),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[700],
+                    RichText(
+                      text: TextSpan(
+                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                        children: _buildDescriptionText(description),
                       ),
                     ),
                     SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () => _saveToFirestore(context),
+                      onTap: () => ref
+                          .read(faceScanResultProvider.notifier)
+                          .saveToFirestore(context),
                       child: Container(
                         padding: EdgeInsets.all(15),
                         decoration: BoxDecoration(
@@ -248,5 +222,24 @@ Solusi
         ),
       ),
     );
+  }
+
+  List<TextSpan> _buildDescriptionText(String description) {
+    List<TextSpan> spans = [];
+    List<String> lines = description.split('\n');
+
+    for (String line in lines) {
+      if (line.startsWith('**') && line.endsWith('**')) {
+        spans.add(TextSpan(
+          text: line.replaceAll('**', ''),
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ));
+      } else {
+        spans.add(TextSpan(text: line));
+      }
+      spans.add(TextSpan(text: '\n'));
+    }
+
+    return spans;
   }
 }
