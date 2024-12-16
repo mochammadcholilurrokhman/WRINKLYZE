@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/image_provider.dart';
-import 'package:image/image.dart' as img; // Import the image package
+import 'package:image/image.dart' as img; 
 
 class DisplayPictureScreen extends ConsumerWidget {
   final File imageFile;
@@ -15,23 +15,23 @@ class DisplayPictureScreen extends ConsumerWidget {
   }) : super(key: key);
 
   Future<File> _flipImageHorizontally(File imageFile) async {
-    // Read the image file
+
     final imageBytes = await imageFile.readAsBytes();
-    // Decode the image
+
     img.Image? originalImage = img.decodeImage(imageBytes);
     if (originalImage == null) {
       throw Exception("Could not decode image");
     }
-    // Flip the image horizontally
+
     img.Image flippedImage =
         img.copyFlip(originalImage, direction: img.FlipDirection.horizontal);
-    // Encode the flipped image back to bytes
+
     final flippedImageBytes = img.encodeJpg(flippedImage);
-    // Create a new file to save the flipped image
+
     final flippedImageFile =
         File(imageFile.path.replaceFirst('.jpg', '_flipped.jpg'));
     await flippedImageFile.writeAsBytes(flippedImageBytes);
-    return flippedImageFile; // Return the flipped image file
+    return flippedImageFile; 
   }
 
   @override
@@ -51,8 +51,7 @@ class DisplayPictureScreen extends ConsumerWidget {
               child: isFrontCamera
                   ? Transform(
                       alignment: Alignment.center,
-                      transform:
-                          Matrix4.rotationY(3.14159), // Mirror the image in UI
+                      transform: Matrix4.rotationY(3.14159),
                       child: Image.file(
                         imageFile,
                         fit: BoxFit.cover,
@@ -74,10 +73,8 @@ class DisplayPictureScreen extends ConsumerWidget {
                   onTap: imageState.isUploading
                       ? null
                       : () async {
-                          File uploadFile =
-                              imageFile; // Default to original file
+                          File uploadFile = imageFile;
                           if (isFrontCamera) {
-                            // Flip the image if using the front camera
                             uploadFile =
                                 await _flipImageHorizontally(imageFile);
                           }

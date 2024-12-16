@@ -75,7 +75,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           'gender': gender,
         }, SetOptions(merge: true));
 
-        // Update the profile provider
         ref
             .read(profileProvider.notifier)
             .updateProfile(newUsername, dob, gender);

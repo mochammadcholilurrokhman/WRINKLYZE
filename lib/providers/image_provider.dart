@@ -54,7 +54,8 @@ class ImageNotifier extends StateNotifier<ImageState> {
       BuildContext context, String imageUrl) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.7:5000/upload_file'),
+        Uri.parse(
+            'http://192.168.1.7:5000/upload_file'), // Depends on your flask api
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'image_url': imageUrl}),
       );
@@ -66,7 +67,6 @@ class ImageNotifier extends StateNotifier<ImageState> {
         double confidence = responseJson['confidence'] ?? 0.0;
         List<dynamic> probabilities = responseJson['probabilities'] ?? [];
 
-        // Navigate to the FaceScanResultPage with the results
         Navigator.push(
           context,
           MaterialPageRoute(
