@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -18,24 +19,18 @@ class BottomNavBar extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: pages[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
+      bottomNavigationBar: CurvedNavigationBar(
+        items: <Widget>[
+          Icon(Icons.home_filled, size: 30, color: Colors.white),
+          Icon(Icons.camera_alt, size: 30, color: Colors.white),
+          Icon(Icons.person, size: 30, color: Colors.white),
         ],
-        currentIndex: selectedIndex,
-        selectedItemColor: Color(0xFF052135),
-        unselectedItemColor: Color(0xFF7995A4),
+        color: Color(0xFF052135),
+        buttonBackgroundColor: Color(0xFF052135),
+        backgroundColor: Color(0xFFe9f0ef),
+        animationCurve: Curves.easeInOut,
+        animationDuration: Duration(milliseconds: 300),
+        index: selectedIndex,
         onTap: (index) {
           if (index == 1) {
             onCameraTapped();
@@ -43,6 +38,7 @@ class BottomNavBar extends StatelessWidget {
             onItemTapped(index);
           }
         },
+        height: 60,
       ),
     );
   }
