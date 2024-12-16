@@ -6,11 +6,18 @@ import 'package:wrinklyze_6/pages/wrinklepedia_page.dart';
 import 'package:wrinklyze_6/widgets/recent_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/home_provider.dart';
-import 'package:intl/intl.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
     final homeState = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
 
@@ -147,6 +154,12 @@ class HomePage extends ConsumerWidget {
                         ],
                       ),
                       child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value.toLowerCase();
+                          });
+                        },
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Search...',
@@ -161,8 +174,7 @@ class HomePage extends ConsumerWidget {
                     ),
                     Expanded(
                       child: StreamBuilder<List<Map<String, dynamic>>>(
-                        stream:
-                            _getFaceResults(), // Use the new method to get face results
+                        stream: _getFaceResults(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(child: CircularProgressIndicator());
@@ -180,15 +192,37 @@ class HomePage extends ConsumerWidget {
                               ),
                             );
                           }
+
+                          final filteredResults = faceResults.where((result) {
+                            return result['title']
+                                    .toLowerCase()
+                                    .contains(_searchQuery) ||
+                                result['skinType']
+                                    .toLowerCase()
+                                    .contains(_searchQuery);
+                          }).toList();
+
+                          if (filteredResults.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'No results found for "$_searchQuery".',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            );
+                          }
+
                           return ListView.builder(
                             padding: const EdgeInsets.all(16.0),
-                            itemCount: faceResults.length,
+                            itemCount: filteredResults.length,
                             itemBuilder: (context, index) {
-                              final result = faceResults[index];
+                              final result = filteredResults[index];
 
                               return GestureDetector(
                                 onTap: () {
-                                  // Navigate to FaceScanResultPage
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
