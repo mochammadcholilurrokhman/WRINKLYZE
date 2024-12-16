@@ -62,67 +62,131 @@ class WrinklepediaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wrinklepedia'),
-        backgroundColor: Colors.white,
+        title: Text('Wrinklepedia',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+              color: Color(0xFF052135),
+            )),
+        backgroundColor: Color(0xFFe9f0ef),
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Poppins',
-        ),
       ),
       body: ListView.builder(
         itemCount: wrinkleData.length,
         itemBuilder: (context, index) {
           final item = wrinkleData[index];
-          return ExpansionTile(
-            title: Text(item['title'],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                )),
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            color: Colors.white,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WrinkleDetailPage(item: item),
+                  ),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16.0)),
+                    child: Image.asset(
                       item['image'],
                       width: double.infinity,
-                      height: 200,
+                      height: 170,
                       fit: BoxFit.cover,
                     ),
-                    SizedBox(height: 8),
-                    Text('Pengertian:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(height: 4),
-                    Text(item['description']),
-                    SizedBox(height: 8),
-                    Text('Klasifikasi:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    ...item['classification']
-                        .map<Widget>((classification) => Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16.0, top: 4.0),
-                              child: Text('- $classification'),
-                            )),
-                    SizedBox(height: 8),
-                    Text('Solusi:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    ...item['solution'].map<Widget>((solution) => Padding(
-                          padding: const EdgeInsets.only(left: 16.0, top: 4.0),
-                          child: Text('- $solution'),
-                        )),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(
+                      item['title'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         },
+      ),
+    );
+  }
+}
+
+class WrinkleDetailPage extends StatelessWidget {
+  final Map<String, dynamic> item;
+
+  const WrinkleDetailPage({Key? key, required this.item}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            item['title'],
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+              color: Color(0xFF052135),
+            ),
+          ),
+        ),
+        backgroundColor: Color(0xFFe9f0ef),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: Image.asset(
+                item['image'],
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text('Pengertian:',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
+            SizedBox(height: 4),
+            Text(item['description'], style: TextStyle(fontFamily: 'Poppins')),
+            SizedBox(height: 8),
+            Text('Klasifikasi:',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
+            ...item['classification'].map<Widget>((classification) => Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 4.0),
+                  child: Text('• $classification',
+                      style: TextStyle(fontFamily: 'Poppins')),
+                )),
+            SizedBox(height: 8),
+            Text('Solusi:',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
+            ...item['solution'].map<Widget>((solution) => Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 4.0),
+                  child: Text('• $solution',
+                      style: TextStyle(fontFamily: 'Poppins')),
+                )),
+          ],
+        ),
       ),
     );
   }
