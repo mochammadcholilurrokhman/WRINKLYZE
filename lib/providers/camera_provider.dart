@@ -57,7 +57,8 @@ class CameraNotifier extends StateNotifier<CameraState> {
     state = state.copyWith(isCameraSwitching: true);
     final controller = CameraController(
       state.cameras![cameraIndex],
-      ResolutionPreset.medium,
+      // ResolutionPreset.medium,
+      ResolutionPreset.high,
     );
 
     await controller.initialize();
