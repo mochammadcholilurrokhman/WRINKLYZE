@@ -108,7 +108,7 @@ Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan 
         ''';
         break;
       case 'wrinkle_berat':
-        displayTitle = 'Wrinkles in Motion (Kerutan Ringan)';
+        displayTitle = 'Only Wrinkles (Kerutan Berat)';
         description = '''
 **Pengertian**
 Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.
