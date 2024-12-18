@@ -11,13 +11,13 @@ class RecentFile extends StatelessWidget {
   final VoidCallback onDelete;
 
   const RecentFile({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.title,
     required this.date,
     required this.captureId,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   Future<void> _deleteCapture(BuildContext context) async {
     try {
@@ -46,7 +46,7 @@ class RecentFile extends StatelessWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Capture deleted successfully!')),
+          const SnackBar(content: Text('Capture deleted successfully!')),
         );
       }
     } catch (e) {
@@ -70,7 +70,7 @@ class RecentFile extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 6,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class RecentFile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -101,7 +101,7 @@ class RecentFile extends StatelessWidget {
                 const SizedBox(height: 4.0),
                 Text(
                   date,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
                   ),
@@ -110,7 +110,7 @@ class RecentFile extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.grey),
+            icon: const Icon(Icons.more_vert, color: Colors.grey),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -118,8 +118,8 @@ class RecentFile extends StatelessWidget {
                   return Wrap(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text("Delete"),
+                        leading: const Icon(Icons.delete, color: Colors.red),
+                        title: const Text("Delete"),
                         onTap: () {
                           _deleteCapture(context);
                           Navigator.pop(context);

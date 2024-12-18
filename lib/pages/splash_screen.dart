@@ -5,6 +5,8 @@ import 'package:wrinklyze_6/pages/welcome_page.dart';
 import 'package:wrinklyze_6/providers/splash_provider.dart';
 
 class SplashScreen extends ConsumerWidget {
+  const SplashScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final splashState = ref.watch(splashProvider);
@@ -28,7 +30,7 @@ class SplashScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Color(0xffE9EEF0),
+      backgroundColor: const Color(0xffE9EEF0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,8 +40,8 @@ class SplashScreen extends ConsumerWidget {
               width: 250,
               height: 250,
             ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/profile_provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
+  const EditProfilePage({super.key});
+
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }

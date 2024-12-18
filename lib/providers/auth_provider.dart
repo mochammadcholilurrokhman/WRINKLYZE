@@ -74,8 +74,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Invalid email or password'),
+        const SnackBar(
+          content: Text('Invalid email or password'),
           backgroundColor: Colors.red,
         ),
       );

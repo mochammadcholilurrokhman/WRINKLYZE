@@ -7,15 +7,17 @@ import 'displaypicture_screen.dart';
 import 'dart:io';
 
 class CameraPage extends ConsumerWidget {
+  const CameraPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cameraState = ref.watch(cameraProvider);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff052135),
-        title: Text('Camera Page', style: TextStyle(color: Colors.white)),
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xff052135),
+        title: const Text('Camera Page', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
@@ -52,11 +54,11 @@ class CameraPage extends ConsumerWidget {
                       ),
                     ],
                   )
-                : Center(child: CircularProgressIndicator()),
+                : const Center(child: CircularProgressIndicator()),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            color: Color(0xff052135),
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            color: const Color(0xff052135),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -77,13 +79,13 @@ class CameraPage extends ConsumerWidget {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text("No image selected."),
                         ),
                       );
                     }
                   },
-                  icon: Icon(Icons.photo_library, color: Colors.white),
+                  icon: const Icon(Icons.photo_library, color: Colors.white),
                   iconSize: 40,
                 ),
                 GestureDetector(
@@ -106,7 +108,7 @@ class CameraPage extends ConsumerWidget {
                         );
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text(
                                 "Failed to capture image. Please try again."),
                           ),
@@ -120,7 +122,7 @@ class CameraPage extends ConsumerWidget {
                       Container(
                         width: 75,
                         height: 75,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color(0xFF7995A4),
                         ),
@@ -128,7 +130,7 @@ class CameraPage extends ConsumerWidget {
                       Container(
                         width: 60,
                         height: 60,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color(0xFFD9D9D9),
                         ),
@@ -136,7 +138,7 @@ class CameraPage extends ConsumerWidget {
                       Container(
                         width: 45,
                         height: 45,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color(0xFFE9EEF0),
                         ),
@@ -148,7 +150,7 @@ class CameraPage extends ConsumerWidget {
                   onPressed: !cameraState.isCameraSwitching
                       ? () => ref.read(cameraProvider.notifier).switchCamera()
                       : null,
-                  icon: Icon(Icons.flip_camera_android_rounded,
+                  icon: const Icon(Icons.flip_camera_android_rounded,
                       color: Colors.white),
                   iconSize: 40,
                 ),

@@ -10,13 +10,13 @@ class FaceScanResultPage extends ConsumerWidget {
   final String title;
 
   const FaceScanResultPage({
-    Key? key,
+    super.key,
     required this.skinType,
     required this.confidence,
     required this.probabilities,
     required this.imagePath,
     required this.title,
-  }) : super(key: key);
+  });
 
   Future<void> _showPredictionDialog(BuildContext context) {
     String dialogTitle = 'Skin Type: $skinType';
@@ -28,19 +28,19 @@ class FaceScanResultPage extends ConsumerWidget {
       builder: (context) {
         return AlertDialog(
           title: Text(dialogTitle,
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Poppins',
                   fontSize: 20)),
           content: SingleChildScrollView(
-            child: Text(content, style: TextStyle(fontFamily: 'Poppins')),
+            child: Text(content, style: const TextStyle(fontFamily: 'Poppins')),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close', style: TextStyle(fontFamily: 'Poppins')),
+              child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
             ),
           ],
         );
@@ -134,11 +134,11 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
     return Scaffold(
       appBar: AppBar(
         title:
-            Text('Face Scan Result', style: TextStyle(fontFamily: 'Poppins')),
+            const Text('Face Scan Result', style: TextStyle(fontFamily: 'Poppins')),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
             color: Colors.black,
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -149,12 +149,12 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       blurRadius: 8,
@@ -170,7 +170,7 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                   ),
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -178,36 +178,36 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                   children: [
                     Text(
                       displayTitle,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                         fontFamily: 'Poppins',
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Divider(thickness: 1, color: Colors.grey[300]),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     RichText(
                       text: TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
                             fontFamily: 'Poppins'),
                         children: _buildDescriptionText(description),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () => ref
                           .read(faceScanResultProvider.notifier)
                           .saveToFirestore(context),
                       child: Container(
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Color(0xff052135),
-                          boxShadow: [
+                          color: const Color(0xff052135),
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black26,
                               blurRadius: 6,
@@ -215,7 +215,7 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                             ),
                           ],
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Save Information",
                             style: TextStyle(
@@ -246,13 +246,13 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
       if (line.startsWith('**') && line.endsWith('**')) {
         spans.add(TextSpan(
           text: line.replaceAll('**', ''),
-          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
         ));
       } else {
         spans
-            .add(TextSpan(text: line, style: TextStyle(fontFamily: 'Poppins')));
+            .add(TextSpan(text: line, style: const TextStyle(fontFamily: 'Poppins')));
       }
-      spans.add(TextSpan(text: '\n'));
+      spans.add(const TextSpan(text: '\n'));
     }
 
     return spans;

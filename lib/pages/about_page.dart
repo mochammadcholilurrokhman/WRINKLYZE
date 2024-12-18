@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +116,7 @@ class AboutPage extends StatelessWidget {
 class BulletPoint extends StatelessWidget {
   final String text;
 
-  BulletPoint({required this.text});
+  const BulletPoint({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {

@@ -58,18 +58,20 @@ class WrinklepediaPage extends StatelessWidget {
     },
   ];
 
+  WrinklepediaPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wrinklepedia',
+        title: const Text('Wrinklepedia',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               fontFamily: 'Poppins',
               color: Color(0xFF052135),
             )),
-        backgroundColor: Color(0xFFe9f0ef),
+        backgroundColor: const Color(0xFFe9f0ef),
         elevation: 0,
         centerTitle: true,
       ),
@@ -78,7 +80,7 @@ class WrinklepediaPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = wrinkleData[index];
           return Card(
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             color: Colors.white,
             child: InkWell(
               onTap: () {
@@ -94,7 +96,7 @@ class WrinklepediaPage extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16.0)),
+                        const BorderRadius.vertical(top: Radius.circular(16.0)),
                     child: Image.asset(
                       item['image'],
                       width: double.infinity,
@@ -106,7 +108,7 @@ class WrinklepediaPage extends StatelessWidget {
                     padding: const EdgeInsets.all(12.0),
                     child: Text(
                       item['title'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                         fontFamily: 'Poppins',
@@ -126,7 +128,7 @@ class WrinklepediaPage extends StatelessWidget {
 class WrinkleDetailPage extends StatelessWidget {
   final Map<String, dynamic> item;
 
-  const WrinkleDetailPage({Key? key, required this.item}) : super(key: key);
+  const WrinkleDetailPage({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +138,7 @@ class WrinkleDetailPage extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             item['title'],
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               fontFamily: 'Poppins',
@@ -144,11 +146,11 @@ class WrinkleDetailPage extends StatelessWidget {
             ),
           ),
         ),
-        backgroundColor: Color(0xFFe9f0ef),
+        backgroundColor: const Color(0xFFe9f0ef),
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -161,29 +163,29 @@ class WrinkleDetailPage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 16),
-            Text('Pengertian:',
+            const SizedBox(height: 16),
+            const Text('Pengertian:',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
-            SizedBox(height: 4),
-            Text(item['description'], style: TextStyle(fontFamily: 'Poppins')),
-            SizedBox(height: 8),
-            Text('Klasifikasi:',
+            const SizedBox(height: 4),
+            Text(item['description'], style: const TextStyle(fontFamily: 'Poppins')),
+            const SizedBox(height: 8),
+            const Text('Klasifikasi:',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
             ...item['classification'].map<Widget>((classification) => Padding(
                   padding: const EdgeInsets.only(left: 16.0, top: 4.0),
                   child: Text('• $classification',
-                      style: TextStyle(fontFamily: 'Poppins')),
+                      style: const TextStyle(fontFamily: 'Poppins')),
                 )),
-            SizedBox(height: 8),
-            Text('Solusi:',
+            const SizedBox(height: 8),
+            const Text('Solusi:',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
             ...item['solution'].map<Widget>((solution) => Padding(
                   padding: const EdgeInsets.only(left: 16.0, top: 4.0),
                   child: Text('• $solution',
-                      style: TextStyle(fontFamily: 'Poppins')),
+                      style: const TextStyle(fontFamily: 'Poppins')),
                 )),
           ],
         ),

@@ -7,7 +7,7 @@ class BottomNavBar extends StatelessWidget {
   final Function onCameraTapped;
   final List<Widget> pages;
 
-  BottomNavBar({
+  const BottomNavBar({super.key, 
     required this.selectedIndex,
     required this.onItemTapped,
     required this.onCameraTapped,
@@ -20,16 +20,16 @@ class BottomNavBar extends StatelessWidget {
       backgroundColor: Colors.white,
       body: pages[selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
-        items: <Widget>[
+        items: const <Widget>[
           Icon(Icons.home_filled, size: 30, color: Colors.white),
           Icon(Icons.camera_alt, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
         ],
-        color: Color(0xFF6F8A9D),
-        buttonBackgroundColor: Color(0xFF6F8A9D),
-        backgroundColor: Color(0xFFe9f0ef),
+        color: const Color(0xFF6F8A9D),
+        buttonBackgroundColor: const Color(0xFF6F8A9D),
+        backgroundColor: const Color(0xFFe9f0ef),
         animationCurve: Curves.easeInOut,
-        animationDuration: Duration(milliseconds: 300),
+        animationDuration: const Duration(milliseconds: 300),
         index: selectedIndex,
         onTap: (index) {
           if (index == 1) {

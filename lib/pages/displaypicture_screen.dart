@@ -9,10 +9,10 @@ class DisplayPictureScreen extends ConsumerWidget {
   final bool isFrontCamera;
 
   const DisplayPictureScreen({
-    Key? key,
+    super.key,
     required this.imageFile,
     required this.isFrontCamera,
-  }) : super(key: key);
+  });
 
   Future<File> _flipImageHorizontally(File imageFile) async {
 
@@ -40,9 +40,9 @@ class DisplayPictureScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff052135),
-        title: Text('Captured Image', style: TextStyle(color: Colors.white)),
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xff052135),
+        title: const Text('Captured Image', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
@@ -64,8 +64,8 @@ class DisplayPictureScreen extends ConsumerWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            color: Color(0xff052135),
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            color: const Color(0xff052135),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -95,17 +95,17 @@ class DisplayPictureScreen extends ConsumerWidget {
                           }
                         },
                   child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(15),
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
                     ),
                     child: imageState.isUploading
-                        ? CircularProgressIndicator(
+                        ? const CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 Color(0xFF7995A4)),
                           )
-                        : Icon(
+                        : const Icon(
                             Icons.check,
                             color: Color(0xFF7995A4),
                             size: 40,

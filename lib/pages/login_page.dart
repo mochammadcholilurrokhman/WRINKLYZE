@@ -5,6 +5,8 @@ import 'package:wrinklyze_6/pages/signup_page.dart';
 import 'package:wrinklyze_6/providers/auth_provider.dart';
 
 class LoginPage extends ConsumerWidget {
+  const LoginPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
@@ -141,7 +143,7 @@ class LoginPage extends ConsumerWidget {
                         backgroundColor: const Color(0xFF052135),
                       ),
                       child: authState.isLoading
-                          ? CircularProgressIndicator(
+                          ? const CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )

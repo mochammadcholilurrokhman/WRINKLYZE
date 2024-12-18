@@ -3,10 +3,12 @@ import 'signup_page.dart';
 import 'login_page.dart';
 
 class WelcomePage extends StatelessWidget {
+  const WelcomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFE9EEF0),
+      backgroundColor: const Color(0xFFE9EEF0),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -21,8 +23,8 @@ class WelcomePage extends StatelessWidget {
                     height: 200,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(height: 30),
-                  Text(
+                  const SizedBox(height: 30),
+                  const Text(
                     'Welcome to Wrinklyze',
                     style: TextStyle(
                       fontFamily: 'Poppins',
@@ -31,8 +33,8 @@ class WelcomePage extends StatelessWidget {
                       color: Color(0xFF112D42),
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'Understanding Your Skin,\nOne Scan at a Time',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -60,12 +62,12 @@ class WelcomePage extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF052135),
+                      backgroundColor: const Color(0xFF052135),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Login',
                       style: TextStyle(
                         fontFamily: 'Poppins',
@@ -76,7 +78,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: 350,
                   height: 60,
@@ -88,12 +90,12 @@ class WelcomePage extends StatelessWidget {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Color(0xFF052135)),
+                      side: const BorderSide(color: Color(0xFF052135)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Sign Up',
                       style: TextStyle(
                         fontFamily: 'Poppins',

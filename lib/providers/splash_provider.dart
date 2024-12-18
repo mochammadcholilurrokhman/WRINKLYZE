@@ -25,7 +25,7 @@ class SplashNotifier extends StateNotifier<SplashState> {
 
   Future<void> _checkUserAuth() async {
     try {
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
 
       final User? user = _auth.currentUser;
 

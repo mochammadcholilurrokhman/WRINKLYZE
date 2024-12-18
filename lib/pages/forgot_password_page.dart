@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/forgot_password_provider.dart';
 
 class ForgotPasswordPage extends ConsumerWidget {
+  const ForgotPasswordPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final forgotPasswordState = ref.watch(forgotPasswordProvider);
@@ -15,7 +17,7 @@ class ForgotPasswordPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -63,12 +65,12 @@ class ForgotPasswordPage extends ConsumerWidget {
                       SnackBar(
                         content: Text(forgotPasswordState.errorMessage!),
                         backgroundColor: Colors.red,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   } else if (!forgotPasswordState.isLoading) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text(
                             'A password reset link has been sent to your email.'),
                         backgroundColor: Colors.green,

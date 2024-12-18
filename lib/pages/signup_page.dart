@@ -4,6 +4,8 @@ import 'package:wrinklyze_6/pages/login_page.dart';
 import 'package:wrinklyze_6/providers/sign_up_provider.dart';
 
 class SignUpPage extends ConsumerWidget {
+  const SignUpPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final signUpState = ref.watch(signUpProvider);
@@ -99,9 +101,9 @@ class SignUpPage extends ConsumerWidget {
                               signUpNotifier.setPassword(value),
                           keyboardType: TextInputType.text,
                           obscureText: true, // Password selalu tersembunyi
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Password',
-                            labelStyle: const TextStyle(
+                            labelStyle: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 16,
                               color: Color(0xFF797979),
@@ -128,9 +130,9 @@ class SignUpPage extends ConsumerWidget {
                               signUpNotifier.setConfirmPassword(value),
                           keyboardType: TextInputType.text,
                           obscureText: true, // Password selalu tersembunyi
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Confirm Password',
-                            labelStyle: const TextStyle(
+                            labelStyle: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 16,
                               color: Color(0xFF797979),
@@ -142,7 +144,7 @@ class SignUpPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 10),
                     // Terms and Conditions Checkbox
-                    Container(
+                    SizedBox(
                       width: 360,
                       child: Row(
                         children: [
@@ -183,7 +185,7 @@ class SignUpPage extends ConsumerWidget {
                         backgroundColor: const Color(0xFF052135),
                       ),
                       child: signUpState.isLoading
-                          ? CircularProgressIndicator(
+                          ? const CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             )

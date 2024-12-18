@@ -12,8 +12,15 @@ In today's world, understanding skin health is crucial for making informed decis
 ## Join the Community
 Be part of a growing community that prioritizes skin health and knowledge. Together, we can foster a better understanding of our skin and make informed choices for a healthier future.
 
+## Technology Used
+- Flutter (Frontend Framework)
+- Firebase (Authentication, Firestore, Storage)
+- Flask (Backend API Framework)
+- Riverpod (State Management)
+- Logistic Regression (Machine Learning Algorithm)
+
 ## Member
-- Ahmed Fathir Syafaat (2241720083 / 02)
-- Moch. Cholilur Rokhman (2241720033 / 15)
-- Tyase Nisa'an Jamilaa (2241720012 / 26)
-- Yuma Rakha Samodra S. (2241720194 / 28)
+- Ahmed Fathir Syafaat (2241720083 / 02) | Front End Developer, Back End Developer
+- Moch. Cholilur Rokhman (2241720033 / 15) | Front End Developer, Machine Learning Engineer
+- Tyase Nisa'an Jamilaa (2241720012 / 26) | Front End Developer, Machine Learning Engineer
+- Yuma Rakha Samodra S. (2241720194 / 28) | Front End Developer, Back End Developer

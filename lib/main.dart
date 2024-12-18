@@ -21,14 +21,16 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Wrinklyze',
       theme: ThemeData(
-        primaryColor: Color(0xFFE9EEF0),
-        scaffoldBackgroundColor: Color(0xFFE9EEF0),
+        primaryColor: const Color(0xFFE9EEF0),
+        scaffoldBackgroundColor: const Color(0xFFE9EEF0),
       ),
       home: SplashScreen(),
     );
@@ -36,6 +38,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
   @override
   _MainPageState createState() => _MainPageState();
 }

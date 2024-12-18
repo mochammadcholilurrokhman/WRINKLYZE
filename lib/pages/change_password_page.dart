@@ -4,6 +4,8 @@ import 'package:wrinklyze_6/pages/forgot_password_page.dart';
 import 'package:wrinklyze_6/providers/change_password_provider.dart';
 
 class ChangePasswordPage extends ConsumerWidget {
+  const ChangePasswordPage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final changePasswordState = ref.watch(changePasswordProvider);
@@ -14,7 +16,7 @@ class ChangePasswordPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -108,12 +110,12 @@ class ChangePasswordPage extends ConsumerWidget {
                       SnackBar(
                         content: Text(changePasswordState.errorMessage!),
                         backgroundColor: Colors.red,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Password changed successfully'),
                         backgroundColor: Colors.green,
                         duration: Duration(seconds: 2),

@@ -55,7 +55,7 @@ class ImageNotifier extends StateNotifier<ImageState> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://192.168.1.7:5000/upload_file'), // Depends on your flask api
+            'http://192.168.1.2:5000/upload_file'), // Depends on your flask api
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'image_url': imageUrl}),
       );
@@ -87,7 +87,7 @@ class ImageNotifier extends StateNotifier<ImageState> {
 
         if (!faceDetected) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text("No face detected in the image."),
               backgroundColor: Colors.red,
             ),
@@ -103,7 +103,7 @@ class ImageNotifier extends StateNotifier<ImageState> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("An unexpected error occurred."),
           backgroundColor: Colors.red,
         ),

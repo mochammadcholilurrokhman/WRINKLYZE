@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wrinklyze_6/providers/home_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -26,7 +28,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 45),
+          const SizedBox(height: 45),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -37,15 +39,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                   children: [
                     Text(
                       'Hi! ${homeState.userName}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'Poppins',
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text(
+                    const SizedBox(height: 5),
+                    const Text(
                       "Let's see the wrinkles on your face!",
                       style: TextStyle(
                         fontSize: 14,
@@ -58,7 +60,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.grey[200],
-                  child: Icon(
+                  child: const Icon(
                     Icons.person,
                     color: Colors.blue,
                     size: 40,
@@ -88,8 +90,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                     width: 65,
                     height: 65,
                   ),
-                  SizedBox(width: 16),
-                  Column(
+                  const SizedBox(width: 16),
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 10),
@@ -113,8 +115,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                       SizedBox(height: 15),
                     ],
                   ),
-                  SizedBox(width: 25),
-                  Icon(
+                  const SizedBox(width: 25),
+                  const Icon(
                     Icons.arrow_forward_ios,
                     color: Colors.white,
                     size: 24,
@@ -126,7 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           // Container for Recent Files
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFFE9EEF0),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16.0),
@@ -134,7 +136,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16.0),
                   topRight: Radius.circular(16.0),
                 ),
@@ -149,7 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 4.0,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
@@ -160,7 +162,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             _searchQuery = value.toLowerCase();
                           });
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Search...',
                           prefixIcon: Icon(
@@ -177,11 +179,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                         stream: _getFaceResults(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return Center(child: CircularProgressIndicator());
+                            return const Center(child: CircularProgressIndicator());
                           }
                           final faceResults = snapshot.data!;
                           if (faceResults.isEmpty) {
-                            return Center(
+                            return const Center(
                               child: Text(
                                 'No face scan results found.',
                                 style: TextStyle(
@@ -206,7 +208,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             return Center(
                               child: Text(
                                 'No results found for "$_searchQuery".',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey,
