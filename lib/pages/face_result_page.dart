@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:wrinklyze_6/providers/face_scan_result_provider.dart';
 
 class FaceScanResultPage extends ConsumerWidget {
@@ -18,37 +19,38 @@ class FaceScanResultPage extends ConsumerWidget {
     required this.title,
   });
 
-  Future<void> _showPredictionDialog(BuildContext context) {
-    String dialogTitle = 'Skin Type: $skinType';
-    String content =
-        'Confidence: ${confidence.toStringAsFixed(2)}\n\nProbabilities: ${probabilities.toString()}';
+  // Future<void> _showPredictionDialog(BuildContext context) {
+  //   String dialogTitle = 'Skin Type: $skinType';
+  //   String content =
+  //       'Confidence: ${confidence.toStringAsFixed(2)}\n\nProbabilities: ${probabilities.toString()}';
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(dialogTitle,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
-                  fontSize: 20)),
-          content: SingleChildScrollView(
-            child: Text(content, style: const TextStyle(fontFamily: 'Poppins')),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
-            ),
-          ],
-        );
-      },
-    );
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text(dialogTitle,
+  //             style: const TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //                 fontFamily: 'Poppins',
+  //                 fontSize: 20)),
+  //         content: SingleChildScrollView(
+  //           child: Text(content, style: const TextStyle(fontFamily: 'Poppins')),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             child:
+  //                 const Text('Close', style: TextStyle(fontFamily: 'Poppins')),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
 
-    return Future.value();
-  }
+  //   return Future.value();
+  // }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,79 +64,87 @@ class FaceScanResultPage extends ConsumerWidget {
             imagePath: imagePath,
             title: title,
           ));
-      _showPredictionDialog(context);
+      // _showPredictionDialog(context);
     });
 
-    String description = '';
     String displayTitle = title;
 
+    List<Map<String, String>> carouselContent = [];
     switch (skinType) {
       case 'wrinkle_ringan':
         displayTitle = 'Wrinkles in Motion (Kerutan Ringan)';
-        description = '''
-**Pengertian**
-Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.
-
-**Klasifikasi**
-• Photoaging sedang
-• Mulai muncul bercak hitam (hiperpigmentasi)
-• Adanya tumor kulit awal namun tidak tampak secara kasat mata
-• Garis senyum paralel mulai muncul di sisi lateral wajah
-
-**Solusi**
-• Pemakaian krim anti-aging yang mengandung tretinoin atau asam alfa hidroksi untuk mengurangi garis halus dan meningkatkan pergantian sel kulit.
-• Chemical peeling ringan untuk memperbaiki tekstur kulit dan mengurangi perubahan warna.
-• Perawatan kulit rutin dengan pelembab dan tabir surya untuk mencegah kerusakan lebih lanjut akibat sinar UV.
-• Perawatan laser atau IPL untuk mengatasi hiperpigmentasi dan memperbaiki struktur kulit.
-        ''';
+        carouselContent = [
+          {
+            'title': 'Pengertian',
+            'content':
+                'Kerutan hanya muncul saat otot wajah bergerak, biasanya di area yang sering digunakan seperti sekitar mata dan mulut.'
+          },
+          {
+            'title': 'Klasifikasi',
+            'content':
+                '• Photoaging sedang\n• Mulai muncul bercak hitam (hiperpigmentasi)\n• Adanya tumor kulit awal namun tidak tampak secara kasat mata\n• Garis senyum paralel mulai muncul di sisi lateral wajah'
+          },
+          {
+            'title': 'Solusi',
+            'content':
+                '• Pemakaian krim anti-aging yang mengandung tretinoin atau asam alfa hidroksi untuk mengurangi garis halus dan meningkatkan pergantian sel kulit.\n• Chemical peeling ringan untuk memperbaiki tekstur kulit dan mengurangi perubahan warna.\n• Perawatan kulit rutin dengan pelembab dan tabir surya untuk mencegah kerusakan lebih lanjut akibat sinar UV.\n• Perawatan laser atau IPL untuk mengatasi hiperpigmentasi dan memperbaiki struktur kulit.'
+          },
+        ];
         break;
       case 'wrinkle_sedang':
         displayTitle = 'Wrinkles at Rest (Kerutan Sedang)';
-        description = '''
-**Pengertian**
-Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.
-
-**Klasifikasi**
-• Photoaging berat
-• Diskromia nyata, telangiectasis (pelebaran pembuluh darah kecil)
-• Adanya tumor kulit seperti keratosis
-• Kerut persisten dan dalam
-
-**Solusi**
-• Tindakan medis lebih intensif seperti mikrodermabrasi atau laser resurfacing untuk menghilangkan lapisan atas kulit dan merangsang produksi kolagen.
-• Botox atau filler kulit untuk mengatasi kerutan dalam yang tidak hilang dengan krim topikal.
-• Pemakaian krim tretinoin atau retinoid kuat untuk meningkatkan regenerasi kulit dan mengurangi tampilan kerutan.
-• Pemeriksaan rutin ke dokter kulit untuk menangani tumor kulit dan melakukan tindakan pencegahan kanker kulit.
-        ''';
+        carouselContent = [
+          {
+            'title': 'Pengertian',
+            'content':
+                'Kerutan tetap terlihat meskipun wajah dalam keadaan rileks, menunjukkan penuaan yang lebih lanjut.'
+          },
+          {
+            'title': 'Klasifikasi',
+            'content':
+                '• Photoaging berat\n• Diskromia nyata, telangiectasis (pelebaran pembuluh darah kecil)\n• Adanya tumor kulit seperti keratosis\n• Kerut persisten dan dalam'
+          },
+          {
+            'title': 'Solusi',
+            'content':
+                '• Tindakan medis lebih intensif seperti mikrodermabrasi atau laser resurfacing untuk menghilangkan lapisan atas kulit dan merangsang produksi kolagen.\n• Botox atau filler kulit untuk mengatasi kerutan dalam yang tidak hilang dengan krim topikal.\n• Pemakaian krim tretinoin atau retinoid kuat untuk meningkatkan regenerasi kulit dan mengurangi tampilan kerutan.\n• Pemeriksaan rutin ke dokter kulit untuk menangani tumor kulit dan melakukan tindakan pencegahan kanker kulit.'
+          },
+        ];
         break;
       case 'wrinkle_berat':
         displayTitle = 'Only Wrinkles (Kerutan Berat)';
-        description = '''
-**Pengertian**
-Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.
-
-**Klasifikasi**
-• Photoaging sangat berat
-• Kulit kuning-keabuan
-• Adanya tumor kulit ganas
-• Hampir tidak ada kulit normal yang tersisa
-
-**Solusi**
-• Pembedahan kosmetik seperti facelift atau browlift untuk memperbaiki kulit yang sangat kendur dan kerut dalam.
-• Perawatan laser intensif untuk meremajakan kulit dan mengatasi hiperpigmentasi dan kerusakan berat akibat sinar matahari.
-• Konsultasi dengan ahli bedah plastik untuk penanganan tumor kulit ganas.
-• Penggunaan krim anti-aging yang kuat serta pengobatan sistemik seperti hormon replacement therapy jika diperlukan.
-        ''';
+        carouselContent = [
+          {
+            'title': 'Pengertian',
+            'content':
+                'Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi. Hampir seluruh area wajah menunjukkan tanda penuaan.'
+          },
+          {
+            'title': 'Klasifikasi',
+            'content':
+                '• Photoaging sangat berat\n• Kulit kuning-keabuan\n• Adanya tumor kulit ganas\n• Hampir tidak ada kulit normal yang tersisa'
+          },
+          {
+            'title': 'Solusi',
+            'content':
+                '• Pembedahan kosmetik seperti facelift atau browlift untuk memperbaiki kulit yang sangat kendur dan kerut dalam.\n• Perawatan laser intensif untuk meremajakan kulit dan mengatasi hiperpigmentasi dan kerusakan berat akibat sinar matahari.\n• Konsultasi dengan ahli bedah plastik untuk penanganan tumor kulit ganas.\n• Penggunaan krim anti-aging yang kuat serta pengobatan sistemik seperti hormon replacement therapy jika diperlukan.'
+          },
+        ];
         break;
       default:
         displayTitle = 'Unknown Skin Type';
-        description = 'No information available for this skin type.';
+        carouselContent = [
+          {
+            'title': 'Unknown Skin Type',
+            'content': 'No information available for this skin type.'
+          },
+        ];
     }
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Face Scan Result', style: TextStyle(fontFamily: 'Poppins')),
+        title: const Text('Face Scan Result',
+            style: TextStyle(fontFamily: 'Poppins')),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -188,13 +198,47 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
                     const SizedBox(height: 8),
                     Divider(thickness: 1, color: Colors.grey[300]),
                     const SizedBox(height: 16),
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontFamily: 'Poppins'),
-                        children: _buildDescriptionText(description),
+                    CarouselSlider.builder(
+                      itemCount: carouselContent.length,
+                      itemBuilder: (BuildContext context, int itemIndex,
+                          int pageViewIndex) {
+                        return Card(
+                          color: const Color(0xffe9eef0),
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  carouselContent[itemIndex]['title']!,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  carouselContent[itemIndex]['content']!,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      options: CarouselOptions(
+                        height: 300,
+                        autoPlay: false,
+                        enlargeCenterPage: true,
+                        aspectRatio: 16 / 9,
+                        viewportFraction: 0.8,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -236,25 +280,5 @@ Kulit penuh dengan kerutan, bahkan di area yang jarang digunakan untuk ekspresi.
         ),
       ),
     );
-  }
-
-  List<TextSpan> _buildDescriptionText(String description) {
-    List<TextSpan> spans = [];
-    List<String> lines = description.split('\n');
-
-    for (String line in lines) {
-      if (line.startsWith('**') && line.endsWith('**')) {
-        spans.add(TextSpan(
-          text: line.replaceAll('**', ''),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
-        ));
-      } else {
-        spans
-            .add(TextSpan(text: line, style: const TextStyle(fontFamily: 'Poppins')));
-      }
-      spans.add(const TextSpan(text: '\n'));
-    }
-
-    return spans;
   }
 }
